@@ -1,0 +1,89 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "G071: 配置 Debug",
+            "type": "process",
+            "command": "C:/ST/STM32CubeCLT_1.20.0/CMake/bin/cmake.exe",
+            "args": ["--preset", "Debug", "-DCMAKE_MAKE_PROGRAM=C:/ST/STM32CubeCLT_1.20.0/Ninja/bin/ninja.exe"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PATH": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin;C:/ST/STM32CubeCLT_1.20.0/Ninja/bin;${env:PATH}"
+                }
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "G071: 编译 Debug",
+            "type": "process",
+            "command": "C:/ST/STM32CubeCLT_1.20.0/CMake/bin/cmake.exe",
+            "args": ["--build", "--preset", "Debug"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PATH": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin;C:/ST/STM32CubeCLT_1.20.0/Ninja/bin;${env:PATH}"
+                }
+            },
+            "dependsOn": "G071: 配置 Debug",
+            "dependsOrder": "sequence",
+            "problemMatcher": ["$gcc"],
+            "group": {"kind": "build", "isDefault": true}
+        },
+        {
+            "label": "G071: 清理 Debug",
+            "type": "process",
+            "command": "C:/ST/STM32CubeCLT_1.20.0/CMake/bin/cmake.exe",
+            "args": ["--build", "--preset", "Debug", "--target", "clean"],
+            "options": {"cwd": "${workspaceFolder}"},
+            "dependsOn": "G071: 配置 Debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "DAP: 编译并烧录 G071",
+            "type": "process",
+            "command": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "args": [
+                "-s", "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts",
+                "-f", "${workspaceFolder}/.vscode/openocd-dap.cfg",
+                "-c", "program {${workspaceFolder}/build/Debug/g071_test.elf} verify reset exit"
+            ],
+            "options": {"cwd": "${workspaceFolder}"},
+            "dependsOn": "G071: 编译 Debug",
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "presentation": {"reveal": "always", "panel": "dedicated", "clear": true}
+        },
+        {
+            "label": "DAP: 检查 G071 连接（不烧录）",
+            "type": "process",
+            "command": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "args": [
+                "-s", "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts",
+                "-f", "${workspaceFolder}/.vscode/openocd-dap.cfg",
+                "-c", "gdb port disabled",
+                "-c", "tcl port disabled",
+                "-c", "telnet port disabled",
+                "-c", "init",
+                "-c", "flash probe 0",
+                "-c", "mdw 0x40015800 1",
+                "-c", "mdh 0x1FFF75E0 1",
+                "-c", "shutdown"
+            ],
+            "options": {"cwd": "${workspaceFolder}"},
+            "problemMatcher": []
+        },
+        {
+            "label": "DAP: 检查配置（不连接芯片）",
+            "type": "process",
+            "command": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "args": [
+                "-s", "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts",
+                "-f", "${workspaceFolder}/.vscode/openocd-dap.cfg",
+                "-c", "echo {G071 CMSIS-DAP config OK}; shutdown"
+            ],
+            "options": {"cwd": "${workspaceFolder}"},
+            "problemMatcher": []
+        }
+    ]
+}

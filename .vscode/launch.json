@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "DAP: G071 编译下载并调试",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/Debug/g071_test.elf",
+            "device": "STM32G071CBU3",
+            "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
+            "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
+            "searchDir": ["D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"],
+            "configFiles": ["${workspaceFolder}/.vscode/openocd-dap.cfg"],
+            "preLaunchTask": "G071: 编译 Debug",
+            "runToEntryPoint": "main"
+        },
+        {
+            "name": "DAP: G071 附加调试（不下载）",
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/Debug/g071_test.elf",
+            "device": "STM32G071CBU3",
+            "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
+            "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
+            "searchDir": ["D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"],
+            "configFiles": ["${workspaceFolder}/.vscode/openocd-dap.cfg"]
+        }
+    ]
+}
