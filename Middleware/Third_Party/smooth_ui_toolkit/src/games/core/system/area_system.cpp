@@ -1,0 +1,118 @@
+/**
+ * @file area_system.cpp
+ * @author Forairaaaaa
+ * @brief
+ * @version 0.1
+ * @date 2025-12-20
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+#include "area_system.hpp"
+#include "games/core/components/shape.hpp"
+#include "games/core/game_object.hpp"
+#include "collision.hpp"
+#include <vector>
+
+namespace smooth_ui_toolkit::games {
+
+void AreaSystem::update(const std::vector<GameObject*>& objects)
+{
+    // 1. 收集所有 Area
+    std::vector<Area*> areas;
+    for (auto* obj : objects) {
+        if (!obj || obj->isDestroyRequested()) {
+            continue;
+        }
+        if (auto* area = obj->get<Area>()) {
+            areas.push_back(area);
+        }
+    }
+
+    // 2. 两两检测
+    for (size_t i = 0; i < areas.size(); ++i) {
+        for (size_t j = i + 1; j < areas.size(); ++j) {
+            test_pair(areas[i], areas[j]);
+        }
+    }
+}
+
+void AreaSystem::handlePreDestroy(ObjectPool<GameObject>& pool)
+{
+    pool.forEach([&](GameObject* obj, int) {
+        if (obj->isDestroyRequested()) {
+            if (auto* area = obj->get<Area>()) {
+                std::vector<GameObject*> overlaps(area->overlaps.begin(), area->overlaps.end());
+                for (auto* other : overlaps) {
+                    if (!other) {
+                        continue;
+                    }
+
+                    if (area->overlaps.erase(other) > 0) {
+                        area->onExited.emit(*other);
+                    }
+
+                    if (auto* other_area = other->get<Area>()) {
+                        if (other_area->overlaps.erase(obj) > 0) {
+                            other_area->onExited.emit(*obj);
+                        }
+                    }
+                }
+
+                pool.forEach([&](GameObject* other, int) {
+                    if (other == obj) {
+                        return;
+                    }
+
+                    if (auto* other_area = other->get<Area>()) {
+                        if (other_area->overlaps.erase(obj) > 0) {
+                            other_area->onExited.emit(*obj);
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+
+void AreaSystem::test_pair(Area* a, Area* b)
+{
+    if (!a || !b || !a->owner || !b->owner || a->owner->isDestroyRequested() || b->owner->isDestroyRequested()) {
+        return;
+    }
+
+    const bool a_monitors_b = a->monitors(*b);
+    const bool b_monitors_a = b->monitors(*a);
+    if (!a_monitors_b && !b_monitors_a) {
+        handle_overlap(a, b, false);
+        handle_overlap(b, a, false);
+        return;
+    }
+
+    auto* sa = a->owner->get<Shape>();
+    auto* sb = b->owner->get<Shape>();
+    if (!sa || !sb)
+        return;
+
+    const bool colliding = collision::is_colliding(*sa, *sb);
+
+    handle_overlap(a, b, a_monitors_b && colliding);
+    handle_overlap(b, a, b_monitors_a && colliding);
+}
+
+void AreaSystem::handle_overlap(Area* self, Area* other, bool colliding)
+{
+    auto* otherObj = other->owner;
+
+    if (colliding) {
+        if (self->overlaps.insert(otherObj).second) {
+            self->onEntered.emit(*otherObj);
+        }
+    } else {
+        if (self->overlaps.erase(otherObj)) {
+            self->onExited.emit(*otherObj);
+        }
+    }
+}
+
+} // namespace smooth_ui_toolkit::games

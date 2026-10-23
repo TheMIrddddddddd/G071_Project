@@ -1,3 +1,13 @@
+# 当前完整显示框架
+
+默认 Debug/Optimized 已迁为原 SHOWCASE：Astra 菜单 29 秒＋六种动画 72 秒。
+日常烧录选择 `DAP: 编译并烧录 G071 Optimized（O2）`；状态面板选择
+`DAP: 编译并烧录 G071 状态面板 Optimized（O2）`。
+固件采用软件 I²C 分段差分刷新、独立 RGB 和有界错误恢复。
+完整验收和资源数据见 `Docs/G071_DISPLAY_FRAMEWORK.md`。本次未自动烧录。
+
+---
+
 # G071 编译、烧录与调试
 
 目标：STM32G071CBU3；CMSIS-DAP；SWD 1000 kHz；Debug ELF：`build/Debug/g071_test.elf`。
@@ -11,6 +21,16 @@
 - 任务 `G071: 清理 Debug`：清理构建产物。
 - 任务 `DAP: 检查 G071 连接（不烧录）`：连接指定探针，探测 Flash 并读取芯片 ID、容量，不下载或复位。
 - 任务 `DAP: 检查配置（不连接芯片）`：只解析 OpenOCD 配置，不初始化探针。
+
+## 优化烧录模式（2026-10-23）
+
+新增 CMake preset `Optimized`，类型 `RelWithDebInfo`，使用 `-O2 -g3`，输出为 `build/Optimized/g071_test.elf`。原有 Debug 保持 `-O0 -g3`，Release 保持 `-Os -g0`，默认编译任务仍为 Debug。
+
+- 只编译：`Ctrl+Shift+P` → `Tasks: Run Task` → `G071: 编译 Optimized（O2）`。
+- 编译、烧录、校验并复位运行：同上选择 `DAP: 编译并烧录 G071 Optimized（O2）`。
+- 下载并调试：运行与调试下拉框选择 `DAP: G071 优化模式编译下载并调试（O2）`，按 F5；停在 main 后再按 F5 继续运行，再测量 SCL。
+
+优化模式中的局部变量可能被优化掉，单步顺序也可能变化。原有“附加调试（不下载）”使用 Debug ELF，不能用于已经烧入 Optimized 的固件。配置变更本身不会执行下载。
 
 ## 接线
 

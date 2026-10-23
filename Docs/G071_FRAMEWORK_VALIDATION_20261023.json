@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-23",
+  "board_flashed": false,
+  "committed": false,
+  "host_showcase_scenarios": 11,
+  "host_memory_scenarios": 1,
+  "host_app_scenarios": 7,
+  "planner_cases": 70540,
+  "uart_tests": 11,
+  "reference_cycle_seconds": 101,
+  "reference_sample_ms": 80,
+  "reference_pixels_sha256": "0c98ae36a146dfb3ccd44670bac48a620e3f094e39dfd03145b03ccff38b8663",
+  "migrated_pixels_sha256": "0c98ae36a146dfb3ccd44670bac48a620e3f094e39dfd03145b03ccff38b8663",
+  "builds": {
+    "Optimized": {
+      "RAM": 29680,
+      "FLASH": 89000,
+      "elf_sha256": "991289bebf17b9e11176ad18d898f4e8fe48d415ece79888d367b3980a55b732"
+    },
+    "Debug": {
+      "RAM": 29760,
+      "FLASH": 128776,
+      "elf_sha256": "03c1137cb4c054c3c64c5d0811980d11a7011dfbd1af7077a8acdfbfdb755697"
+    },
+    "StatusOptimized": {
+      "RAM": 12640,
+      "FLASH": 34860,
+      "elf_sha256": "69003eca37356f888f6e0d532345e7c2fa60e469c647aabf2dea3f190d753cc3"
+    },
+    "StatusDebug": {
+      "RAM": 12672,
+      "FLASH": 50624,
+      "elf_sha256": "d7279f701ff72e48ead5a410dc00517b8a9c30ccee29cc18ebedbb7d9ee0e6a7"
+    }
+  }
+}

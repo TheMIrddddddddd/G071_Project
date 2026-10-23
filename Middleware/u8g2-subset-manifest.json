@@ -1,0 +1,130 @@
+{
+  "source": "../oled_test/UserMiddlewares",
+  "upstream": "https://github.com/olikraus/u8g2",
+  "tag": "2.37.1",
+  "commit": "414efcdb7a908667ea461c9e3a3a31da14fc4ea5",
+  "files": [
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_bitmap.c",
+      "sha256": "04a85f7ccc9e646a6bafe781c16cc22633d5d2bcd0bf13b18973d72afd56da5d"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_box.c",
+      "sha256": "d329109913b00cfc42038cec55c07b0d8faf50e5995808fa0e0c132a5afd37c5"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_buffer.c",
+      "sha256": "9ca065a47345bb6bba3f7a81cad60ad7a15c3f2ca926137ad20f1e0ef1df4609"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_circle.c",
+      "sha256": "6fbcc0dea8c64389ae6537f3e97722edfb85730480fe39747cf4aa1ebd717148"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_font.c",
+      "sha256": "3d205ff43e0da767aaf87787777ef38ae930a876702c560e7d0e60183ad9730a"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_hvline.c",
+      "sha256": "e63dad17dfe6501fb4b8f47ea7daaaa75c720a88016cfa9af39cc17523fac808"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_intersection.c",
+      "sha256": "ed81a18801dfc27220f09162d8ec2a74cc76467bf672431dd6fac9bde66b46c4"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_kerning.c",
+      "sha256": "c249d6394de157f6c2914bfafcca9bbcd09197fdac96c36a1d9877c8155e5ccc"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_line.c",
+      "sha256": "a26d7b7ab8ebe3d48a318a93ae618b04b02623c8d86ee02d18ed47b1f4f0302e"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_ll_hvline.c",
+      "sha256": "86fce4a252cbe32cdff4ac8bc694866136366d0311f8aaee1b0517a3c69b4ce8"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2_setup.c",
+      "sha256": "80bf40f40e35ab010d33ac8bebb9a7035c6293645f6f6b662a31a9fe52321d15"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_byte.c",
+      "sha256": "bb0f154d4fd7adf26b7f9f4188298d9d3e867627b6edc83385d64e26ec00cf23"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_8x8.c",
+      "sha256": "da32dff05050e4b18ea9007fdefc49ef31bf24b85ba2200fa791755aa81b2884"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_capture.c",
+      "sha256": "36f3b20027f4dec2a48053e1f83034b559cd62723c74f3cabc956567de83d776"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_cad.c",
+      "sha256": "3932b469ab8a27c330f52bd10abb2964600436495f320f93045d14dceddc91b7"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_display.c",
+      "sha256": "d04b8972f964401c447bf6105b9951f50cfe4b665248e9a4c875c5c32b910cdd"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_gpio.c",
+      "sha256": "884bc9f983276256faced6767a942ca5e79a03568b284165c0d1c4f855b0d630"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_setup.c",
+      "sha256": "3f50da0b74fea01a3386a3192d412aceadc09cac3e5cbb0b879c1a7e80a38886"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_string.c",
+      "sha256": "20cfe514ca42bfa22fb5a52aaf9bac3ab8b1e69c994df3fdeb73e3353e9687cc"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_u16toa.c",
+      "sha256": "5a6877ecb5b0665a48f952588e5bdd173407cf4dac399bcfa75ba64dad412b42"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8_d_ssd1306_128x64_noname.c",
+      "sha256": "dcfaf1582aca38fff9799a592b895ca86680b1c0d34822074d24d2ea5c8cbeac"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8g2.h",
+      "sha256": "2d13834bb4449ba0c38756e9502d661e7bf3f63a244a9cc20270a9bd1d2fcc47"
+    },
+    {
+      "path": "Third_Party/u8g2/csrc/u8x8.h",
+      "sha256": "c90875cf2ae48ffbe7932c10ea49d2a742c2a3a7a61b6b8d2df45a6721859ff9"
+    },
+    {
+      "path": "Third_Party/u8g2/LICENSE",
+      "sha256": "35070a56a2cb59560278c1734c51da94b679bc208c5244625769a0f1df001d30"
+    },
+    {
+      "path": "Ports/u8g2/u8g2_port.c",
+      "sha256": "4a88ff61b9bce398db4c4491ed91df5cf9f56870fadcf3283bff003d43423717",
+      "local_sha256": "2c4581b6542834b4b0ea9353cebe662b217ede36cb1f151bbbb9a77310f6f5cd"
+    },
+    {
+      "path": "Ports/u8g2/u8g2_port.h",
+      "sha256": "fddd3859f23fa1656927efc5fa6dfcb150a8a9afcd147f5a8656defa17d2945b"
+    },
+    {
+      "path": "Ports/u8g2/u8g2_font_5x7_tf.c",
+      "sha256": "67f9d1ff7b9172f45160a4c1db0a4ad24eb547aa89e28453e0b60b36f483069c"
+    },
+    {
+      "path": "Ports/u8g2/CMakeLists.txt",
+      "sha256": "dc515cee8192ea2df1eafe8ab8284741300156f0db7816240b295ace7aa36f2c",
+      "local_sha256": "09f9369ca5b45cc9eb56b09e722a45a50af4e062e48aaa1e4146b3f6ab77084f"
+    },
+    {
+      "path": "Ports/u8g2/tests/CMakeLists.txt",
+      "sha256": "ee7376059465b299c647134e4e7dac58df7987d12cbebcbe030ca3c798521e28"
+    },
+    {
+      "path": "Ports/u8g2/tests/test_u8g2_port.c",
+      "sha256": "1dba9d25e214d2f18adc4337dd8840b9af2488dc5323bf1738711795ffe9782d"
+    }
+  ]
+}

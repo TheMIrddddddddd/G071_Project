@@ -1,0 +1,573 @@
+--- a/Core/Src/astra/astra_logo.cpp
++++ b/Core/Src/astra/astra_logo.cpp
+@@ -30,9 +30,9 @@
+   while(onRender) {
+     time++;
+ 
+-    static std::vector<float> yStars;
+-    static std::vector<float> yStarsTrg;
+-    static std::vector<float> xStars;
++    static std::array<float, 2> yStars;
++    static std::array<float, 2> yStarsTrg;
++    static std::array<float, 2> xStars;
+ 
+     static std::string text = "astra UI";
+     static std::string copyRight = "powered by";
+--- a/Core/Src/astra/config/config.h
++++ b/Core/Src/astra/config/config.h
+@@ -6,7 +6,7 @@
+ #ifndef ASTRA_CORE_SRC_SYSTEM_H_
+ #define ASTRA_CORE_SRC_SYSTEM_H_
+ 
+-#include "../../hal/hal_dreamCore/components/oled/graph_lib/u8g2/u8g2.h"
++#include "u8g2.h"
+ 
+ namespace astra {
+ /**
+@@ -71,14 +71,14 @@
+   float logoCopyRightHeight = 8; //logo文字高度
+   unsigned char logoStarNum = 16; //logo星星数量
+ 
+-  const unsigned char *logoTitleFont = u8g2_font_Cascadia;
+-  const unsigned char *logoCopyRightFont = u8g2_font_myfont;
+-  const unsigned char *mainFont = u8g2_font_myfont;
++  const unsigned char *logoTitleFont = u8g2_font_5x7_tf;
++  const unsigned char *logoCopyRightFont = u8g2_font_5x7_tf;
++  const unsigned char *mainFont = u8g2_font_5x7_tf;
+ 
+   //如果未使用u8g2库 请自行修改这里
+-  //const unsigned char *logoTitleFont = u8g2_font_Cascadia;
+-  //const unsigned char *logoCopyRightFont = u8g2_font_myfont;
+-  //const unsigned char *mainFont = u8g2_font_myfont;
++  //const unsigned char *logoTitleFont = u8g2_font_5x7_tf;
++  //const unsigned char *logoCopyRightFont = u8g2_font_5x7_tf;
++  //const unsigned char *mainFont = u8g2_font_5x7_tf;
+ 
+   float checkBoxWidth = 8;
+   float checkBoxHeight = 8;
+@@ -87,7 +87,7 @@
+   float checkBoxRadius = 1;
+ };
+ 
+-static config &getUIConfig() {
++inline config &getUIConfig() {
+   static config astraConfig;
+   return astraConfig;
+ }
+--- a/Core/Src/astra/ui/item/camera/camera.cpp
++++ b/Core/Src/astra/ui/item/camera/camera.cpp
+@@ -40,16 +40,16 @@
+  * @return 0: in view, 1: upper, 2: lower
+  */
+ unsigned char Camera::outOfView(float _x, float _y) {
+-  if (_x < 0 - this->x | _y < 0 - this->y) return 1;
+-  if (_x > (0 - this->x) + systemConfig.screenWeight - 1 | _y > (0 - this->y) + systemConfig.screenHeight - 1) return 2;
++  if (_x < 0 - this->x || _y < 0 - this->y) return 1;
++  if (_x > (0 - this->x) + systemConfig.screenWeight - 1 || _y > (0 - this->y) + systemConfig.screenHeight - 1) return 2;
+   return 0;
+ }
+ 
+-std::vector<float> Camera::getPosition() {
++std::array<float, 2> Camera::getPosition() {
+   return {x, y};
+ }
+ 
+-std::vector<float> Camera::getPositionTrg() {
++std::array<float, 2> Camera::getPositionTrg() {
+   return {xTrg, yTrg};
+ }
+ 
+@@ -77,7 +77,7 @@
+   this->yTrg = 0 - _y;
+ }
+ 
+-void Camera::go(const std::vector<float> &_pos) {
++void Camera::go(const std::array<float, 2> &_pos) {
+   this->xTrg = 0 - _pos[0];
+   this->yTrg = 0 - _pos[1];
+ }
+@@ -143,6 +143,7 @@
+ }
+ 
+ void Camera::update(Menu *_menu, Selector *_selector) {
++  Item::updateConfig();
+ 
+   if (_menu->cameraPosMemoryFlag) {
+     go(0 - _menu->getCameraMemoryPos()[0], 0 - _menu->getCameraMemoryPos()[1]);
+@@ -150,7 +151,7 @@
+     _menu->resetCameraMemoryPos();
+   }
+     //if (this->isReached(_menu->getCameraMemoryPos())) _menu->cameraPosMemoryFlag = false;
+-  if (_menu->getType() == "List") goToListItemRolling(dynamic_cast<List*>(_menu));
++  if (_menu->getType() == "List") goToListItemRolling(static_cast<List*>(_menu));
+   else if (_menu->getType() == "Tile") goToTileItem(_menu->selectIndex);
+ 
+   this->render();
+--- a/Core/Src/astra/ui/item/camera/camera.h
++++ b/Core/Src/astra/ui/item/camera/camera.h
+@@ -28,9 +28,9 @@
+   Camera(float _x, float _y); //build a camera instance with position.
+ 
+   unsigned char outOfView(float _x, float _y);
+-  unsigned char outOfView(std::vector<float> _pos) { return outOfView(_pos[0], _pos[1]); }
+-  [[nodiscard]] std::vector<float> getPosition();
+-  [[nodiscard]] std::vector<float> getPositionTrg();
++  unsigned char outOfView(std::array<float, 2> _pos) { return outOfView(_pos[0], _pos[1]); }
++  [[nodiscard]] std::array<float, 2> getPosition();
++  [[nodiscard]] std::array<float, 2> getPositionTrg();
+ 
+   void init(const std::string &_type);
+ 
+@@ -41,7 +41,7 @@
+ 
+   //go to a position.
+   void go(float _x, float _y);
+-  void go(const std::vector<float> &_pos); //go to a position.
++  void go(const std::array<float, 2> &_pos); //go to a position.
+   void goDirect(float _x, float _y);
+ 
+   //move to a position.
+--- a/Core/Src/astra/ui/item/item.h
++++ b/Core/Src/astra/ui/item/item.h
+@@ -35,7 +35,7 @@
+ //todo 未实现功能
+ inline void Animation::exit() {
+   static unsigned char fadeFlag = 1;
+-  static unsigned char bufferLen = 8 * HAL::getBufferTileHeight() * HAL::getBufferTileWidth();
++  const size_t bufferLen = 8U * HAL::getBufferTileHeight() * HAL::getBufferTileWidth();
+   auto *bufferPointer = (unsigned char *) HAL::getCanvasBuffer();
+ 
+   HAL::delay(getUIConfig().fadeAnimationSpeed);
+@@ -81,8 +81,8 @@
+ }
+ 
+ inline void Animation::blur() {
+-  static unsigned char bufferLen = 8 * HAL::getBufferTileHeight() * HAL::getBufferTileWidth();
+-  static auto *bufferPointer = (unsigned char *) HAL::getCanvasBuffer();
++  const size_t bufferLen = 8U * HAL::getBufferTileHeight() * HAL::getBufferTileWidth();
++  auto *bufferPointer = (unsigned char *) HAL::getCanvasBuffer();
+ 
+   for (uint16_t i = 0; i < bufferLen; ++i) bufferPointer[i] = bufferPointer[i] & (i % 2 == 0 ? 0x55 : 0xAA);
+ }
+--- a/Core/Src/astra/ui/item/menu/menu.cpp
++++ b/Core/Src/astra/ui/item/menu/menu.cpp
+@@ -29,7 +29,9 @@
+ Menu::Position Menu::getItemPosition(unsigned char _index) const { return childMenu[_index]->position; }
+ 
+ std::vector<unsigned char> Menu::generateDefaultPic() {
+-  this->picDefault.resize(120, 0xFF);
++  // Project port: tile icons are explicitly installed once at initialization.
++  // Text-only menu nodes do not allocate two unused 120-byte pictures.
++  this->picDefault.clear();
+   return this->picDefault;
+ }
+ 
+@@ -39,7 +41,7 @@
+ 
+ Menu *Menu::getPreview() const { return parent; }
+ 
+-void Menu::init(const std::vector<float>& _camera) { }
++void Menu::init(const std::array<float, 2>& _camera) { }
+ 
+ void Menu::deInit() {
+   //todo 未实现完全
+@@ -66,7 +68,7 @@
+   } else return false;
+ }
+ 
+-void List::childPosInit(const std::vector<float> &_camera) {
++void List::childPosInit(const std::array<float, 2> &_camera) {
+   unsigned char _index = 0;
+ 
+   for (auto _iter : childMenu) {
+@@ -151,7 +153,29 @@
+   this->positionForeground = {};
+ }
+ 
+-void List::render(const std::vector<float> &_camera) {
++void List::update() {
++  Item::updateConfig();
++  for (auto *child : childMenu)
++    Animation::move(&child->position.y, child->position.yTrg, astraConfig.listAnimationSpeed);
++  if (!childMenu.empty())
++    positionForeground.hBarTrg = (selectIndex + 1) * ((float)systemConfig.screenHeight / getItemNum());
++  Animation::move(&positionForeground.hBar, positionForeground.hBarTrg, astraConfig.listAnimationSpeed);
++  Animation::move(&positionForeground.xBar, positionForeground.xBarTrg, astraConfig.listAnimationSpeed);
++}
++
++void Tile::update() {
++  Item::updateConfig();
++  for (auto *child : childMenu)
++    Animation::move(&child->position.x, child->position.xTrg, astraConfig.tileAnimationSpeed);
++  if (!childMenu.empty())
++    positionForeground.wBarTrg = (selectIndex + 1) * ((float)systemConfig.screenWeight / getItemNum());
++  Animation::move(&positionForeground.yDottedLine, positionForeground.yDottedLineTrg, astraConfig.tileAnimationSpeed);
++  Animation::move(&positionForeground.yArrow, positionForeground.yArrowTrg, astraConfig.tileAnimationSpeed);
++  Animation::move(&positionForeground.wBar, positionForeground.wBarTrg, astraConfig.tileAnimationSpeed);
++  Animation::move(&positionForeground.yBar, positionForeground.yBarTrg, astraConfig.tileAnimationSpeed);
++}
++
++void List::render(const std::array<float, 2> &_camera) {
+   Item::updateConfig();
+ 
+   HAL::setDrawType(1);
+@@ -173,11 +197,9 @@
+                      astraConfig.listTextMargin + _camera[1],
+                      _iter->title);
+     //这里的yTrg在addItem的时候就已经确定了
+-    Animation::move(&_iter->position.y, _iter->position.yTrg, astraConfig.listAnimationSpeed);
+   }
+ 
+   //draw bar.
+-  positionForeground.hBarTrg = (selectIndex + 1) * ((float) systemConfig.screenHeight / getItemNum());
+   //画指示线
+   HAL::drawHLine(systemConfig.screenWeight - astraConfig.listBarWeight, 0, astraConfig.listBarWeight);
+   HAL::drawHLine(systemConfig.screenWeight - astraConfig.listBarWeight,
+@@ -195,12 +217,9 @@
+     HAL::drawBox(0, 0, systemConfig.screenWeight, systemConfig.screenHeight);
+     HAL::setDrawType(1);
+   }
+-
+-  Animation::move(&positionForeground.hBar, positionForeground.hBarTrg, astraConfig.listAnimationSpeed);
+-  Animation::move(&positionForeground.xBar, positionForeground.xBarTrg, astraConfig.listAnimationSpeed);
+-}
+-
+-void Tile::childPosInit(const std::vector<float> &_camera) {
++}
++
++void Tile::childPosInit(const std::array<float, 2> &_camera) {
+   unsigned char _index = 0;
+ 
+   for (auto _iter : childMenu) {
+@@ -291,7 +310,7 @@
+   this->positionForeground = {};
+ }
+ 
+-void Tile::render(const std::vector<float> &_camera) {
++void Tile::render(const std::array<float, 2> &_camera) {
+   Item::updateConfig();
+ 
+   HAL::setDrawType(1);
+@@ -303,14 +322,10 @@
+                  astraConfig.tilePicHeight,
+                  _iter->pic.data());
+     //这里的xTrg在addItem的时候就已经确定了
+-    Animation::move(&_iter->position.x,
+-                    _iter->position.xTrg,
+-                    astraConfig.tileAnimationSpeed);
+   }
+ 
+   //draw bar.
+   //在屏幕最上方 两个像素高
+-  positionForeground.wBarTrg = (selectIndex + 1) * ((float) systemConfig.screenWeight / getItemNum());
+   HAL::drawBox(0, positionForeground.yBar, positionForeground.wBar, astraConfig.tileBarHeight);
+ 
+   //draw left arrow.
+@@ -342,10 +357,5 @@
+ 
+   //draw dotted line.
+   HAL::drawHDottedLine(0, positionForeground.yDottedLine, systemConfig.screenWeight);
+-
+-  Animation::move(&positionForeground.yDottedLine, positionForeground.yDottedLineTrg, astraConfig.tileAnimationSpeed);
+-  Animation::move(&positionForeground.yArrow, positionForeground.yArrowTrg, astraConfig.tileAnimationSpeed);
+-  Animation::move(&positionForeground.wBar, positionForeground.wBarTrg, astraConfig.tileAnimationSpeed);
+-  Animation::move(&positionForeground.yBar, positionForeground.yBarTrg, astraConfig.tileAnimationSpeed);
+-}
+-}
++}
++}
+--- a/Core/Src/astra/ui/item/menu/menu.h
++++ b/Core/Src/astra/ui/item/menu/menu.h
+@@ -19,12 +19,12 @@
+   [[nodiscard]] virtual std::string getType() const { return "Base"; }
+ 
+ public:
+-  std::vector<float> cameraPosMemory = {};
+-  void rememberCameraPos(const std::vector<float> &_camera) {
++  std::array<float, 2> cameraPosMemory = {};
++  void rememberCameraPos(const std::array<float, 2> &_camera) {
+     cameraPosMemory = _camera;
+     cameraPosMemoryFlag = true;
+   }
+-  [[nodiscard]] std::vector<float> getCameraMemoryPos() const { return cameraPosMemory; }
++  [[nodiscard]] std::array<float, 2> getCameraMemoryPos() const { return cameraPosMemory; }
+   void resetCameraMemoryPos() { cameraPosMemory = {0, 0}; }
+   //编写一个变量 指示该页面到底有没有记忆
+   bool cameraPosMemoryFlag = false;
+@@ -40,7 +40,7 @@
+   Position position{};
+ 
+   [[nodiscard]] Position getItemPosition(unsigned char _index) const;
+-  virtual void childPosInit(const std::vector<float> &_camera) {}
++  virtual void childPosInit(const std::array<float, 2> &_camera) {}
+   virtual void forePosInit() {}
+ 
+ public:
+@@ -69,11 +69,12 @@
+   ~Menu() = default;
+ 
+ public:
+-  void init(const std::vector<float>& _camera); //每次打开页面都要调用一次
++  void init(const std::array<float, 2>& _camera); //每次打开页面都要调用一次
+   void deInit(); //每次关闭页面都要调用一次
+ 
+ public:
+-  virtual void render(const std::vector<float> &_camera) {}  //render all child item.
++  virtual void update() {}
++  virtual void render(const std::array<float, 2> &_camera) {}  //render all child item.
+ 
+ public:
+   bool addItem(Menu *_page);
+@@ -94,7 +95,7 @@
+   PositionForeground positionForeground{};
+ 
+ public:
+-  void childPosInit(const std::vector<float> &_camera) override;
++  void childPosInit(const std::array<float, 2> &_camera) override;
+   void forePosInit() override;
+ 
+   List();
+@@ -103,12 +104,13 @@
+   List(const std::string &_title, const std::vector<unsigned char>& _pic);
+ 
+ public:
+-  std::vector<unsigned char> boundary = {0, static_cast<unsigned char>(systemConfig.screenHeight / astraConfig.listLineHeight - 1)};
+-  [[nodiscard]] std::vector<unsigned char> getBoundary() const { return boundary; }
++  std::array<unsigned char, 2> boundary = {0, static_cast<unsigned char>(systemConfig.screenHeight / astraConfig.listLineHeight - 1)};
++  [[nodiscard]] std::array<unsigned char, 2> getBoundary() const { return boundary; }
+   void refreshBoundary(unsigned char _l, unsigned char _r) { boundary = {_l, _r}; }
+ 
+ public:
+-  void render(const std::vector<float> &_camera) override;
++  void update() override;
++  void render(const std::array<float, 2> &_camera) override;
+ };
+ 
+ class Tile : public Menu {
+@@ -127,7 +129,7 @@
+   PositionForeground positionForeground{};
+ 
+ public:
+-  void childPosInit(const std::vector<float> &_camera) override;
++  void childPosInit(const std::array<float, 2> &_camera) override;
+   void forePosInit() override;
+ 
+   Tile();
+@@ -136,7 +138,8 @@
+   Tile(const std::string &_title, const std::vector<unsigned char> &_pic);
+ 
+ public:
+-  void render(const std::vector<float> &_camera) override;
++  void update() override;
++  void render(const std::array<float, 2> &_camera) override;
+ };
+ 
+ }
+--- a/Core/Src/astra/ui/item/selector/selector.cpp
++++ b/Core/Src/astra/ui/item/selector/selector.cpp
+@@ -46,8 +46,7 @@
+ //    else return;
+ //  }
+ 
+-  if (_index > menu->childMenu.size() - 1) return;
+-  if (_index < 0) return;
++  if (!menu || menu->childMenu.empty() || _index >= menu->childMenu.size()) return;
+   menu->selectIndex = _index;
+ 
+   setPosition();
+@@ -83,21 +82,27 @@
+ bool Selector::destroy() {
+   if (this->menu == nullptr) return false;
+ 
+-  delete this->menu;
++  // Menu ownership belongs to the fixed application tree.
+   this->menu = nullptr;
++  return true;
+ }
+ 
+-void Selector::render(std::vector<float> _camera) {
++void Selector::update() {
+   Item::updateConfig();
+-
+-  //实际上 这里已经实现过渡动画了
+   Animation::move(&x, xTrg, astraConfig.selectorXAnimationSpeed);
+   Animation::move(&y, yTrg, astraConfig.selectorYAnimationSpeed);
+   Animation::move(&h, hTrg, astraConfig.selectorHeightAnimationSpeed);
+   Animation::move(&w, wTrg, astraConfig.selectorWidthAnimationSpeed);
++  if (menu && menu->getType() == "Tile")
++    Animation::move(&yText, yTextTrg, astraConfig.selectorYAnimationSpeed);
++}
++
++void Selector::render(std::array<float, 2> _camera) {
++  Item::updateConfig();
++
++  //实际上 这里已经实现过渡动画了
+ 
+   if (menu->getType() == "Tile") {
+-    Animation::move(&yText, yTextTrg, astraConfig.selectorYAnimationSpeed);
+ 
+     //draw text.
+     //文字不受摄像机的影响
+@@ -145,7 +150,7 @@
+   }
+ }
+ 
+-std::vector<float> Selector::getPosition() {
++std::array<float, 2> Selector::getPosition() {
+   return {xTrg, yTrg};
+ }
+ }--- a/Core/Src/astra/ui/item/selector/selector.h
++++ b/Core/Src/astra/ui/item/selector/selector.h
+@@ -10,27 +10,27 @@
+ namespace astra {
+ class Selector : public Item {
+ private:
+-  Menu *menu;
++  Menu *menu = nullptr;
+ 
+ public:
+   //列表页中就是选择框的坐标 磁贴页中就是大框的坐标
+-  float x, xTrg;
+-  float y, yTrg;
++  float x = 0, xTrg = 0;
++  float y = 0, yTrg = 0;
+ 
+   /*LIST*/
+-  float w, wTrg;
+-  float h, hTrg;
++  float w = 0, wTrg = 0;
++  float h = 0, hTrg = 0;
+   /*LIST*/
+ 
+   /*TILE*/
+-  float yText, yTextTrg;  //磁贴页标题坐标
++  float yText = 0, yTextTrg = 0;  //磁贴页标题坐标
+   /*TILE*/
+ 
+   Selector() = default;
+   //最牛逼的来了 在磁贴中 文字和大框就是selector
+   //这样就可以弄磁贴的文字出现动画了
+ 
+-  std::vector<float> getPosition();
++  std::array<float, 2> getPosition();
+   void setPosition();
+ 
+   void go(unsigned char _index);
+@@ -40,7 +40,8 @@
+   bool inject(Menu *_menu); //inject menu instance to prepare for render.
+   bool destroy(); //destroy menu instance.
+ 
+-  void render(std::vector<float> _camera);
++  void update();
++  void render(std::array<float, 2> _camera);
+ };
+ }
+ #endif //ASTRA_CORE_SRC_ASTRA_UI_ELEMENT_SELECTOR_SELECTOR_H_
+--- a/Core/Src/astra/ui/item/widget/widget.cpp
++++ b/Core/Src/astra/ui/item/widget/widget.cpp
+@@ -36,7 +36,7 @@
+   delete this;
+ }
+ 
+-void CheckBox::renderIndicator(float _x, float _y, const std::vector<float> &_camera) {
++void CheckBox::renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) {
+   Item::updateConfig();
+   //绘制外框
+   HAL::setDrawType(1);
+@@ -52,7 +52,7 @@
+                  astraConfig.checkBoxHeight / 2);
+ }
+ 
+-void CheckBox::render(const std::vector<float> &_camera) {
++void CheckBox::render(const std::array<float, 2> &_camera) {
+   //todo 选中复选框后弹出消息提醒 这玩意现在我倒觉得没啥必要 可以暂时不做
+ }
+ 
+@@ -91,14 +91,14 @@
+   delete this;
+ }
+ 
+-void PopUp::renderIndicator(float _x, float _y, const std::vector<float> &_camera) {
++void PopUp::renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) {
+   Item::updateConfig();
+   HAL::setDrawType(1);
+   //把左下角转换为左上角 居中
+   HAL::drawEnglish(_x + _camera[0] + 1, _y + _camera[1] + astraConfig.listTextHeight, std::to_string(value));
+ }
+ 
+-void PopUp::render(const std::vector<float> &_camera) {
++void PopUp::render(const std::array<float, 2> &_camera) {
+   //Widget::render(_camera);
+ }
+ 
+@@ -144,14 +144,14 @@
+   delete this;
+ }
+ 
+-void Slider::renderIndicator(float _x, float _y, const std::vector<float> &_camera) {
++void Slider::renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) {
+   Item::updateConfig();
+   HAL::setDrawType(1);
+   HAL::drawRFrame(_x + _camera[0] - 1, _y + _camera[1] - 1, 10, 8, 1);
+   HAL::drawBox(_x + _camera[0] + 1, _y + _camera[1] + 1, lengthIndicator, 4);
+ }
+ 
+-void Slider::render(const std::vector<float> &_camera) {
++void Slider::render(const std::array<float, 2> &_camera) {
+   Widget::render(_camera);
+ }
+ }
+--- a/Core/Src/astra/ui/item/widget/widget.h
++++ b/Core/Src/astra/ui/item/widget/widget.h
+@@ -24,10 +24,10 @@
+ 
+ public:
+   //绘制控件在列表中的指示器
+-  virtual void renderIndicator(float _x, float _y, const std::vector<float> &_camera) {}
++  virtual void renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) {}
+ 
+ public:
+-  virtual void render(const std::vector<float> &_camera) {}
++  virtual void render(const std::array<float, 2> &_camera) {}
+ };
+ 
+ class CheckBox : public Widget {
+@@ -50,10 +50,10 @@
+   void deInit() override;
+ 
+ public:
+-  void renderIndicator(float _x, float _y, const std::vector<float> &_camera) override;
++  void renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) override;
+ 
+ public:
+-  void render(const std::vector<float> &_camera) override;
++  void render(const std::array<float, 2> &_camera) override;
+ };
+ 
+ class PopUp : public Widget {
+@@ -91,10 +91,10 @@
+   void deInit() override;
+ 
+ public:
+-  void renderIndicator(float _x, float _y, const std::vector<float> &_camera) override;
++  void renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) override;
+ 
+ public:
+-  void render(const std::vector<float> &_camera) override;
++  void render(const std::array<float, 2> &_camera) override;
+ };
+ 
+ class Slider : public Widget {
+@@ -138,10 +138,10 @@
+   void deInit() override;
+ 
+ public:
+-  void renderIndicator(float _x, float _y, const std::vector<float> &_camera) override;
++  void renderIndicator(float _x, float _y, const std::array<float, 2> &_camera) override;
+ 
+ public:
+-  void render(const std::vector<float> &_camera) override;
++  void render(const std::array<float, 2> &_camera) override;
+ };
+ }
+ 

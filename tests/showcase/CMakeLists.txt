@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.22)
+project(g071_ui_tests LANGUAGES C CXX)
+enable_testing()
+set(REPO "${CMAKE_CURRENT_LIST_DIR}/../..")
+add_subdirectory("${REPO}/Middleware/Ports/u8g2" u8g2)
+add_subdirectory("${REPO}/Middleware/Ports/smooth_ui_toolkit" smooth)
+add_subdirectory("${REPO}/Middleware/Ports/astra" astra)
+add_executable(test_showcase test_showcase.cpp
+ "${REPO}/Middleware/Ports/showcase/showcase_model.cpp"
+ "${REPO}/Middleware/Ports/smooth_ui_toolkit/smooth_memory.cpp")
+target_include_directories(test_showcase PRIVATE "${REPO}/Middleware/Ports/showcase")
+target_link_libraries(test_showcase PRIVATE oled_smooth_upstream oled_u8g2_port oled_astra)
+foreach(scenario bitmap order decoupled cycle spring retarget menu cadence guards allocation preview)
+ add_test(NAME showcase_${scenario} COMMAND test_showcase ${scenario})
+endforeach()
+add_executable(test_memory test_memory.cpp "${REPO}/Middleware/Ports/smooth_ui_toolkit/smooth_memory.cpp")
+target_include_directories(test_memory PRIVATE "${REPO}/Middleware/Ports/smooth_ui_toolkit")
+add_test(NAME bounded_memory_failure COMMAND test_memory)

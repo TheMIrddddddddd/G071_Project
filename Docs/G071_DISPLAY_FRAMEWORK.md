@@ -1,0 +1,86 @@
+# G071 显示框架与 SHOWCASE 迁移交接
+
+## 当前交付
+
+默认 SHOWCASE 与源 `oled_test` 的实际烧录模式一致：Astra 菜单 29 秒、六种摇杆算法各 12 秒，共 101 秒循环。保留菜单树、图标、弹窗、记忆位置及速度 73；不叠加调试状态。模型按原算法目标 75 Hz 推进，绘图最多 30 Hz，屏幕帧率取决于 CPU、软件 I²C 和画面变化量，三者不能混称为 75 FPS。
+
+状态面板通过独立构建模式选择，显示 uptime、成功应用的 RGB 颜色、刷新帧数和耗时、累计总线错误。RGB 仍独立每 500 ms 红→绿→蓝→全亮→全灭循环。两种画面共享相同传输、恢复和日志框架。
+
+本次不包含真实摇杆 ADC、PCA9535 输入或其他外设迁移。源 SHOWCASE 使用自动输入，无须这些器件。
+
+## 分层与接口
+
+- `Core/Src/main.c`：CubeMX 初始化后只调用 `app_main_init()`，循环只调用 `app_main_poll()`。
+- App：`app_display` 管理模型、绘图、发布与诊断；`app_rgb` 管理目标与成功状态；`app_bus` 管理设备退避和共享总线恢复。
+- BSP：已验证的 PB5/PB6 软件 I²C 保留时序；OLED 负责初始化和页列定位，TCA6507 负责寄存器，UART 保留 DMA 环形缓冲。TIM2 64 位微秒累计接口只读计数器，不改配置，前台须至少每约 71 分钟读一次；正常每轮均读取。
+- Middleware：u8g2 绘图，Astra 菜单，smooth_ui_toolkit 动画，OledRefresh 纯算法与缓冲所有权。
+
+刷新使用两份所有权交换画面和一份成功画面，共 3072 字节。活动帧不可变；绘图可替换另一份待发送帧，只保留最新状态。每帧完整绘制后发布，不向活动帧增量画图。
+
+差分算法按页查找变化，合并短间隙；每个区域按最多 32 个像素字节分段，每段重新定位。成本为 `length + 7 × ceil(length/32)` 字节、`2 × ceil(length/32)` 次事务。整帧为 1248 个线中字节（含地址和控制，不含 START/STOP 时长）。合并是有界启发式，不宣称拆包后的全局最优；重新计算成本，不优于整帧时回退。无变化不发送。
+
+扩展接口：
+
+- `board_oled_start(frame)`：初始化、清 132×8 RAM、全帧和首次开屏。
+- `board_oled_submit(frame, plan)`：借用不可变画面和页内区域规划，直到 READY/FAULT 交还；验证范围，防止长度求和回绕。
+- `board_oled_abort(reason)`：停止软件传输状态机，不复位总线；返回后的同步传输已无硬件读者。
+- `OLED_RefreshBeginDraw/Publish/Start/Complete`：管理活动、待发送及成功基准；失败使基准失效，保留最新待发送帧；CancelDraw 显式取消未完成绘图。
+- `app_rgb_set(mode,color)`：CYCLE/FIXED/FLASH/BREATH，颜色掩码 P0=绿、P1=蓝、P2=红。FLASH/BREATH 仅在目标变化或恢复后写芯片 BANK0，由芯片独立运行；静态输出 P3-P6 固定关。
+
+闪烁固定为约 256 ms 亮/256 ms 灭；呼吸为约 512 ms 渐亮、64 ms 保持、512 ms 渐灭、128 ms 灭。芯片 BANK 的双脉冲序列保持两个相同脉冲。具体时长受芯片内部时钟公差影响，尚未实测。
+
+## 错误恢复与边界
+
+轮询顺序为 UART → 总线恢复 → 到期 RGB → 模型、绘图和一次 OLED 短事务。没有 ISR 中绘图或恢复，没有整帧关中断。软件 I²C 同步短包仍占用 CPU；RGB 调度误差可能包含单包和一次绘图耗时，`rgb_late_ms` 供板级评估，不是硬实时零抖动保证。
+
+地址 NACK 只退避对应设备：先两次等待 500 ms，第三次失败等待 5 秒，再继续探测/初始化。OLED 初始化还有自身 100/200 ms 等待，因此实际失败事务间隔不小于退避时间。健康 RGB 不因 OLED 离线被重新初始化。
+
+BUS_BUSY/SCL_TIMEOUT 令共享总线进入阻塞状态；显示立即放弃活动帧并使基准失效。500 ms 间隔尝试恢复，最多三次；三次失败后冷却 5 秒再开始下一组。每次恢复释放线、检查 SCL、最多九个恢复时钟及 STOP。外部持续拉低或断电无法靠软件保证解除，只能有界报告并周期重试。
+
+恢复成功增加总线代次，OLED 重新初始化并全帧同步最新画面，RGB 重写目标。不无限阻塞，不使用全局中断屏蔽。错误累计、连续失败、失败阶段/页/列、恢复结果可在 App/BSP 状态中查看，串口每 5 秒输出 DISPLAY/DIFF/PERF 汇总。
+
+## C++ 内存与资源
+
+迁移源码保留许可证和版本，记录于 `Middleware/showcase-source-manifest.json`，本地端口调整有独立 SHA256。厂商源码保持与相邻工程一致；当前工程独立构建，只有 `--reference` 像素对比测试需要原工程。
+
+UI 使用固定 2048 字节首次适配分配池，可合并空闲块；初始化后封闭 `new/new[]`。越界或封闭后分配抛出 bad_alloc，由 App UI 边界捕获，串口报告并显示回退状态页，RGB/UART 继续运行。为正确展开构造与菜单调用链，UI C++ 开启异常；不使用 longjmp 跨越 C++ 对象。池的固定空间已计入链接 RAM；C 库最小堆 512 字节、MSP 栈预留 4096 字节。
+
+链接器额外限制 RAM 预算为 32 KB（物理 36 KB），并保留原 Flash 128 KB 上限。2026-10-23 最终构建：
+
+| 配置 | 画面 | Flash B | RAM B，含预留 |
+| --- | --- | ---: | ---: |
+| Optimized | SHOWCASE | 89000 | 29680 |
+| Debug | SHOWCASE | 128776 | 29760 |
+| StatusOptimized | 状态面板 | 34860 | 12640 |
+| StatusDebug | 状态面板 | 50624 | 12672 |
+
+Debug Flash 余量较小，日常演示建议 Optimized。静态 `.su` 检查中 App 显示轮询单函数约 152 B、模型构造约 208 B；这些不是完整调用链或板上栈高水位测量，4 KB 栈仍待板级长期验证。
+
+## 使用方式
+
+默认 SHOWCASE：运行 **DAP: 编译并烧录 G071 Optimized（O2）**。
+
+状态面板：运行 **DAP: 编译并烧录 G071 状态面板 Optimized（O2）**。两者分别使用 build/Optimized 和 build/StatusOptimized，任务自动配置正确模式；也提供 Debug 版本及对应调试配置。
+
+COM9、115200 8N1。关注启动 UI init/heap_peak、FAULT/RECOVER、DISPLAY 的成功帧与耗时、DIFF 字节数以及 PERF 的绘图耗时和串口丢弃。日志中的帧数为成功传输数，不代表屏幕经过肉眼验收。
+
+## 已完成的本地验收
+
+- SHOWCASE 11 个源行为场景及有界内存失败测试通过，初始化后无新增 C++ 分配。
+- 实际 App/模型/库/差分/BSP 联合模型测试 7 个场景通过：模拟 304 秒超过三轮演示、OLED 单独离线、RGB 单独离线、部分写失败、SCL 卡住/冷却恢复、独立硬件灯效配置、UI 内存不足。
+- 差分测试 70540 个输入（含 65536 个穷举掩码和 5000 个随机帧）：边界、像素重建、实际包成本、整帧上限、所有权、替换及失败全帧重同步通过。
+- OLED 初始化/区域发送/非法范围/错误退出/计时回绕、软件 I²C 与 TIM2 累计、RGB 数据包、UART 11 项测试通过。
+- 源与迁移版本使用相同主机工具链，在整轮 101 秒每 80 ms 抽样输出像素；两文件逐字节一致，SHA256 为 `0c98ae36a146dfb3ccd44670bac48a620e3f094e39dfd03145b03ccff38b8663`。
+- 四种 ARM 构建与内存预算检查通过，App、刷新算法及新增 BSP 通过严格告警/转换检查和 GCC 静态分析。源码无 L476 HAL、DWT 或硬件 I²C DMA 依赖。
+
+复现：
+
+```powershell
+python tests/run_framework_tests.py --reference
+python scripts/verify_ui_sources.py
+python scripts/validate_build_budget.py build/Optimized/g071_test.elf
+```
+
+## 板级待验证
+
+本轮未烧录、未提交、未上传。后续授权烧录后，至少观察三轮 SHOWCASE、RGB 连续切换、多次复位，验证设备掉线/重新接入，以及受控故障恢复。记录真实帧率、总线波形、RGB lateness、UART 错误/丢弃及栈使用；主机的模拟时间和相同像素不证明 G071 上的显示速度或电气恢复。

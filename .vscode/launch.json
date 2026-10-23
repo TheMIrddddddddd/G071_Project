@@ -12,9 +12,33 @@
             "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
             "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
             "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
-            "searchDir": ["D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"],
-            "configFiles": ["${workspaceFolder}/.vscode/openocd-dap.cfg"],
+            "searchDir": [
+                "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"
+            ],
+            "configFiles": [
+                "${workspaceFolder}/.vscode/openocd-dap.cfg"
+            ],
             "preLaunchTask": "G071: 编译 Debug",
+            "runToEntryPoint": "main"
+        },
+        {
+            "name": "DAP: G071 优化模式编译下载并调试（O2）",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/Optimized/g071_test.elf",
+            "device": "STM32G071CBU3",
+            "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
+            "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
+            "searchDir": [
+                "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"
+            ],
+            "configFiles": [
+                "${workspaceFolder}/.vscode/openocd-dap.cfg"
+            ],
+            "preLaunchTask": "G071: 编译 Optimized（O2）",
             "runToEntryPoint": "main"
         },
         {
@@ -28,8 +52,52 @@
             "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
             "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
             "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
-            "searchDir": ["D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"],
-            "configFiles": ["${workspaceFolder}/.vscode/openocd-dap.cfg"]
+            "searchDir": [
+                "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"
+            ],
+            "configFiles": [
+                "${workspaceFolder}/.vscode/openocd-dap.cfg"
+            ]
+        },
+        {
+            "name": "DAP: G071 状态面板 Debug",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/StatusDebug/g071_test.elf",
+            "device": "STM32G071CBU3",
+            "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
+            "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
+            "searchDir": [
+                "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"
+            ],
+            "configFiles": [
+                "${workspaceFolder}/.vscode/openocd-dap.cfg"
+            ],
+            "preLaunchTask": "G071: 编译状态面板 Debug",
+            "runToEntryPoint": "main"
+        },
+        {
+            "name": "DAP: G071 状态面板 Optimized（O2）",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/StatusOptimized/g071_test.elf",
+            "device": "STM32G071CBU3",
+            "serverpath": "D:/浏览器下载/OpenOCD-20260121-0.12.0/bin/openocd.exe",
+            "armToolchainPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin",
+            "gdbPath": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin/arm-none-eabi-gdb.exe",
+            "searchDir": [
+                "D:/浏览器下载/OpenOCD-20260121-0.12.0/share/openocd/scripts"
+            ],
+            "configFiles": [
+                "${workspaceFolder}/.vscode/openocd-dap.cfg"
+            ],
+            "preLaunchTask": "G071: 编译状态面板 Optimized（O2）",
+            "runToEntryPoint": "main"
         }
     ]
 }

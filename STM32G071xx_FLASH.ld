@@ -59,12 +59,17 @@ RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 36K
 FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
 }
 
+/* Includes static 2KB UI arena, libc minimum heap and 4KB stack reserve.
+   Keep at least 4KB of the physical 36KB RAM outside the link budget. */
+ASSERT((_end - ORIGIN(RAM) + _Min_Heap_Size + _Min_Stack_Size) <= 32K,
+       "G071 application exceeds 32KB RAM budget")
+
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
 _sstack = _estack - _Min_Stack_Size;
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+_Min_Stack_Size = 0x1000; /* 4KB foreground/C++ and IRQ stack reserve */
 
 /* Define output sections */
 SECTIONS

@@ -6,15 +6,15 @@
             "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
-		    "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
-            "cacheVariables": {
-            }
+            "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
+            "cacheVariables": {}
         },
         {
             "name": "Debug",
             "inherits": "default",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "APP_DISPLAY_MODE": "SHOWCASE"
             }
         },
         {
@@ -22,6 +22,29 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "Optimized",
+            "displayName": "G071 优化烧录模式（O2，保留调试符号）",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "APP_DISPLAY_MODE": "SHOWCASE"
+            }
+        },
+        {
+            "name": "StatusDebug",
+            "inherits": "Debug",
+            "cacheVariables": {
+                "APP_DISPLAY_MODE": "STATUS"
+            }
+        },
+        {
+            "name": "StatusOptimized",
+            "inherits": "Optimized",
+            "cacheVariables": {
+                "APP_DISPLAY_MODE": "STATUS"
             }
         }
     ],
@@ -33,6 +56,18 @@
         {
             "name": "Release",
             "configurePreset": "Release"
+        },
+        {
+            "name": "Optimized",
+            "configurePreset": "Optimized"
+        },
+        {
+            "name": "StatusDebug",
+            "configurePreset": "StatusDebug"
+        },
+        {
+            "name": "StatusOptimized",
+            "configurePreset": "StatusOptimized"
         }
     ]
 }

@@ -1,0 +1,516 @@
+{
+  "source": "../oled_test/UserMiddlewares",
+  "files": [
+    {
+      "path": "Third_Party/astra/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "Third_Party/astra/README.md",
+      "sha256": "5f3d299ed535cf56a34d17015d3550a398cbf7bdc12d7b88c05a36431e002392"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/astra_logo.cpp",
+      "sha256": "502ef062582411d77d859a428b24c177f0fc95a2cfde35b37885cf77e4d7177b"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/astra_logo.h",
+      "sha256": "e0e4ea8f9db7f5e84881d83a7c1c6245313d133171866449acbb94f5ca0b9a9e"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/astra_rocket.cpp",
+      "sha256": "8a1fed4ee63111b51f4cdc946f946e08894bad2f335ccd5aea0a86df9fb9e36e"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/astra_rocket.h",
+      "sha256": "eb2f8928024e9d099386ca0d0dc79303704ff90d01d57a3202365165239daabf"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/hal/hal.cpp",
+      "sha256": "ca8c79c319c50c116aac09b8b77d7637b6984b027a3955858cd92b2fb468f9f9"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/hal/hal.h",
+      "sha256": "a8b795caebf3d37c5d8488b0613b6fe77d89679f1b50e5c4e61976271904d204"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/app/astra_app.cpp",
+      "sha256": "5362719c5f4edabf2bb171949c736ab8edb0819572c9556a4c4a22672cbf9779"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/app/astra_app.h",
+      "sha256": "773f97f1d0aab51cfa9dced8e3bdb1b1c187f831e44665865d50a6719f6cf262"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/app/astra_app_i.h",
+      "sha256": "4ac7f752ae987dc795c0d119afeb2defb420aebea7c34261e7ccc25522dfa031"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/config/config.h",
+      "sha256": "4cead0025aa7fface92a338d3cd08f86bc0d421a3b1a0c32101d05fda6e492d8"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/launcher.cpp",
+      "sha256": "db834f3b46d848760c84fd825d4c93539d0bdf95a5776b1d10b49d3f49e4ca72"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/launcher.h",
+      "sha256": "8d61662a3c02e0366c5ab3eb6fb1a0d252b73fd01d3c9e68575c65ad82f8aa4b"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/item.h",
+      "sha256": "20a9bae99b2c3f5f04e15a7bb9544d11af7fc53415a6f8991d5414ad686f6ebd"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/camera/camera.cpp",
+      "sha256": "8d80e3d62888d4a4d7dacb5187d6714b0313b1e232d37c2109c0f0dd75acf4a7"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/camera/camera.h",
+      "sha256": "950e6c4cb9ee70e92fb0c0c07e20908fb1d967369826b699826d6ee4f049699e"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/menu/menu.cpp",
+      "sha256": "9cdb3d86bd8dea62a871e10a8d3c4e08bbc4e1275f8e83916932313b19fdfd84"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/menu/menu.h",
+      "sha256": "51e635bf77b7cc4672c9c9d87ac1e02b4f82405057de80a30ed2ac583ea7b050"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/plugin/plugin.cpp",
+      "sha256": "92782bc83a2e740b1f820a6b60ed1af0836d0b9f83702986f4054c453b832d33"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/plugin/plugin.h",
+      "sha256": "4a0af8b8b184d12445277ee1605adc5933759eaecaa2b3d73c3ddcbc45a98b4f"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/selector/selector.cpp",
+      "sha256": "75ccef4cbd3080f525a08d8e8eb2790da5aca0205f390d24acf55efa729efc7b"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/selector/selector.h",
+      "sha256": "e8b1ec2d38b85adce1d522863c394fb4b68039049443d9c24e3265d39ca3040c"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/widget/widget.cpp",
+      "sha256": "7abc91bc7a20e515028e45463edb907e896b164058f22051dda7142d862cc716"
+    },
+    {
+      "path": "Third_Party/astra/Core/Src/astra/ui/item/widget/widget.h",
+      "sha256": "11f90382a3ca6e54923bbd1f1cd39739c9d1093cd8da0a57f4049cd043b5f38e"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/LICENSE",
+      "sha256": "f9db7ea7026e1ec808bab58868bc949d62a081c1727b17f842e907a3757c5476"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/README.md",
+      "sha256": "9d079d7df2cb35968d7c084a28adeb37ef2c16e7fbb4b8aa714f490e5ac17e5d"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/smooth_ui_toolkit.hpp",
+      "sha256": "fb227f73058fc536f76565826c9f59d7d60b89f3eecacc8d099287a413b1eb64"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/core.hpp",
+      "sha256": "3afa841b7742d67c5f999d2822824f185ea8688477615617599d644d2b05857c"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/tools.hpp",
+      "sha256": "37bb89592237e00cf696e9a5d13708120df783e14c9aea47b33444e717e13a81"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/uitk/short_namespace.hpp",
+      "sha256": "c8685e2d937d817578ef5d0d43a76926a508c804bc2dc0eae1005538d6b4f6f1"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/widget/widget.hpp",
+      "sha256": "4ef259731e1e8abcc98bdd2483bdb15ea8a8eaa17bb99e4991fe48b181ff420c"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/widget/select_menu/smooth_options.cpp",
+      "sha256": "a0b646ad73f0995a4e2a79aa2a3c730cbd6bce3e558a556b6de2e78af92a577c"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/widget/select_menu/smooth_options.hpp",
+      "sha256": "3c4a5fd27349775f09b86873096cf6be80b5c0ea3682eb856443b1629d63aaa3"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/widget/select_menu/smooth_selector.cpp",
+      "sha256": "4b53b21e81f74ccaa26a824110645522da1c1a852e4052e353907296f9d503d3"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/widget/select_menu/smooth_selector.hpp",
+      "sha256": "ed28fcceb2d115cf16507728168284e1a47c6178de50e228b27ae15fc1c190af"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/event/event_queue.hpp",
+      "sha256": "98cdba7aae6fd6c35e60945bed11a69274757435d1a671ccd0b982862aa5c98e"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/event/signal.hpp",
+      "sha256": "e0560607cd30ca0ac1f2a253745647a964a8e4b78e766958c78e8783d2ad6a87"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/fpm/fixed.hpp",
+      "sha256": "70fe5810fa27ea85b39b4616a1d322ed42134ce81e3dabe4a6a0cc176dff23ff"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/fpm/ios.hpp",
+      "sha256": "862a8c79c6fd5627dd47648634db8d06f3f63fc69611ff54fd131fe32764def9"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/fpm/math.hpp",
+      "sha256": "73f618e04d52f804226ced049a2aa9b604c4d275425ba7cf099cfbf1457e2b82"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/fpm/readme.md",
+      "sha256": "5a84a76953f0715ff22f02628eb35c49196f08af8684d6b158d65dba0c38acfb"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/object_pool/object_pool.hpp",
+      "sha256": "c744fb239389488f510e6717ed457ab4fb5ceb8f5386a027a5854bd610e94af7"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/observable/observable.hpp",
+      "sha256": "238e192d4a55ee0a7a44355b2846d5037604005b5cb8ada71706b2925ce4c9a0"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/observable/single_observable.hpp",
+      "sha256": "2bc5d2b152067176f46d1bc1f45d437725219913406c5db39139cea4e7277ce1"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/random/random.hpp",
+      "sha256": "4dd3f3130709ccce26e50b11b0d57fa86c19ceecadd9ab8ed7aa5164655ff070"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/tools/ring_buffer/ring_buffer.hpp",
+      "sha256": "5d6a43421c90b595db724c585149656fdf8e6311872805754f15257bfe111455"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/breakout/ball.hpp",
+      "sha256": "42af43b0354a4243d01118be88d332e882fdc3853c70ba06ab349fa6496ad89c"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/breakout/breakout.hpp",
+      "sha256": "a01b4eeaa9a5ae97fa9190b927a81f523b7635a112ab8ebf128ac66e7586103e"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/breakout/brick.hpp",
+      "sha256": "cdf3cff191d01a910a6f1c4659b48c53e6783d35a275aee657c7114bac1955fd"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/breakout/paddle.hpp",
+      "sha256": "87b57684b6bcd71e8834b79bbecdae93b5c968a74b61b249b3b3dc1f81c36274"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/breakout/types.hpp",
+      "sha256": "385d0435d4cd864bcba64fc1d5eba03439ee181c684470e2f0ab7052dfdead4d"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/core.h",
+      "sha256": "7bdbc99573e3132f519fd173a5f94064374f1b2b1a5cba2834d03dbe817d8056"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/frame_clock.hpp",
+      "sha256": "8f81c3dd595a30766e6ac898718ccbd4c0829a02c7db8de1bb94e301b4622ee9"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/game_object.cpp",
+      "sha256": "e1a2781bd62db62619461bb0d969e1a91448dff249b4dba6d329841c54f1d00a"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/game_object.hpp",
+      "sha256": "9a31306b0ff3ed6b596ce9f233b84482d2850025a5221038b44ceaddd12d8822"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/world.hpp",
+      "sha256": "23b44b2d0416475ac93fedf4685105a1371c8a975ac354f0c553b17d4f9c6fcc"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/dvd_screensaver/dvd_screensaver.hpp",
+      "sha256": "7e48dee2ef344c9ce448fbe498f77249c53a518a4426babf980f5d187eb09643"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/components/area.hpp",
+      "sha256": "6794a4ccfd8254c1fe4f4536316cbc2e0b20a0eb49d87ab88cdddfad83c22078"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/components/component.hpp",
+      "sha256": "c19e28913ad30f59ef0121b363a848d25680a2d67ae92b600615f437ea9556de"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/components/rigidbody.hpp",
+      "sha256": "2a378a19d73e4dd7ac200a97b90b285fad6298349c5ad178b6adbea303c4be0c"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/components/shape.hpp",
+      "sha256": "98980edfe78b23142995450839663320896de002b1f514e4375dbcfa21b85a54"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/components/transform.hpp",
+      "sha256": "793a1378af3c61a88af557ae609a3a7c00f0a5108590e1a06fee9347e22cb877"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/system/area_system.cpp",
+      "sha256": "e994e4171196abda6e2db06d21e917263faaeb6f67446f923bfb7e98eb3f5450"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/system/area_system.hpp",
+      "sha256": "59c6457d3f6fd9a7052109391624ae571bc1cfcaa8b79c7c87a3776a5579c514"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/games/core/system/collision.hpp",
+      "sha256": "49409bf988ea423c93bb4bb40b274d41d0a1b50a242d96a5beeb76aa69db84ec"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/easing/ease.cpp",
+      "sha256": "a0b4a7851e1fea6074291cd362fe6caa0a32655405f4d9afd1360efdd829046f"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/easing/ease.hpp",
+      "sha256": "cc7c4c5ca29c57733d7aee9fe8b7ac4618dfed39b649bb1e042037f429f7c9bd"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/hal/hal.cpp",
+      "sha256": "a35df42b8dcd10d80a31f453df90da554995f251d9b0b2f7e2b95972f33952b4"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/hal/hal.hpp",
+      "sha256": "ef2e1cd495f108cac2a495def997ccaa97301886ea8898990a00083a16c17772"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/math/base.hpp",
+      "sha256": "b1c2514edc44c6d88b697d649d506e4ea4e6d80a9c3f68f3507923e3cbb79efa"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/math/math.hpp",
+      "sha256": "4597e404af853fac58b9b8f0b3e4e57c8ea9d008d11eac723259976d26a2087f"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/math/shape.hpp",
+      "sha256": "b963e045227a6d2d0922213b15b7f6335fedfde60e41be6dabc5546aada2f87e"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/math/vector.hpp",
+      "sha256": "41cd812636b324bf4f1b397f73773684fb1bdcdfd8c617c99bd0bb76fc5c3919"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/easing/cubic_bezier/cubic_bezier.cpp",
+      "sha256": "2f2f7de9b8d104bb09d6d814bb79436d40a4329aedaf69705f3e2e4770134654"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/easing/cubic_bezier/cubic_bezier.hpp",
+      "sha256": "e87db11ec56455cf0806858577c6aba155494e2c03b101dfe77a8eb63cda9b37"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate/animate.cpp",
+      "sha256": "5352f9bcb7a44f3647e5b48dd3052547d1612989f6c82f93bb4e44e26da08675"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate/animate.hpp",
+      "sha256": "f27a300a5500f1118992144c5e9486f05cc1ea4f1395918dd0a2b1255c928c43"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_value/animate_value.cpp",
+      "sha256": "d397a9c2df538a7c15b53212737f685f663406b1a57b4256d1a1399ad74161c3"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_value/animate_value.hpp",
+      "sha256": "0193d11b5dc14b9fc4a18a4fd0dc1fadb594cc501d11a5aa99ac4d07432ead1a"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_vector/animate_vector2.cpp",
+      "sha256": "cb3f1908b59a81fd48b24ac61a8fa606caf1ca02f6bb84caa5ae1f5f2f42540b"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_vector/animate_vector2.hpp",
+      "sha256": "c545dbf241dc432ef0bf9876476f87f53a244c0025c30eef160646c282c31d78"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_vector/animate_vector4.cpp",
+      "sha256": "65bc63b0cd27aa2f541c93fc3f0e297fe24c5a55914b92205f9cb1cab92537b7"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/animate_vector/animate_vector4.hpp",
+      "sha256": "2b297f448de5b4f1df9ca42ce39b0c1273e54e250db54cfa866a5256aab75fd5"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/generators/generators.hpp",
+      "sha256": "d65af29ae88c61c9a51c32afa1bed1caf00edc9e5c0b1a71f8690570e3dc98eb"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/sequence/animate_sequence.cpp",
+      "sha256": "e3266ca7cf9375b10a8cf436208a52641c6eded10e76e910b6cbd80ae8eb39ee"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/sequence/animate_sequence.hpp",
+      "sha256": "fa21a3048a6634a1b5138b94adf5bdf1574db15bfc68821a68efa494c4591b24"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/generators/easing/easing.cpp",
+      "sha256": "47d905568fa778a86f81dc9e52edc98545d447224e3a4fcc96bbd3e56d64e4b5"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/generators/easing/easing.hpp",
+      "sha256": "4411b78f4d32e1d3a2170133b69c0531f060e5bdb8ce8ca755f969ecd69f117a"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/generators/spring/spring.cpp",
+      "sha256": "65a47223375f72791f08be2ba1ce2002d696d16855f559efc10c6350ef26c4e3"
+    },
+    {
+      "path": "Third_Party/smooth_ui_toolkit/src/core/animation/generators/spring/spring.hpp",
+      "sha256": "f9fa13f039c55fab34229c041819688a18ec355c20f4d30f1530e00746a3135e"
+    },
+    {
+      "path": "Ports/astra/astra_port.cpp",
+      "sha256": "f49b4c227e262ba3ec2457546557fbfe7c857d28443c2947c6cee84fc32cc28a"
+    },
+    {
+      "path": "Ports/astra/astra_port.h",
+      "sha256": "d27bf549cc1cd3a65ab66c164195dbfd5784a9d1bfecf43e13648e984b6fa3a8"
+    },
+    {
+      "path": "Ports/astra/CMakeLists.txt",
+      "sha256": "598cb8cc4281a30f877cf0678469291abb4f7d1642f0c6de5968d97daf61c855"
+    },
+    {
+      "path": "Ports/astra/README.md",
+      "sha256": "e33e55bdafb22ae1624d694a7eff99d92e0728f5a76692d2d1af9f51fb2335e6"
+    },
+    {
+      "path": "Ports/astra/patches/stm32-port.patch",
+      "sha256": "d49560a1edbd0a76b29799f12570dc1e0c8aa2ece56e8b35c533b6fed2e1c5f3"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/CMakeLists.txt",
+      "sha256": "150d13e50811d50f1d72f6c2e32d622fa2e35541895c921ebbba2ed1a2938e8d"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_draw.cpp",
+      "sha256": "1d431f8f65b1da1342ffa2fc58748acbe2f9176107e63a7c00b9c9cf9cc91315"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_draw.h",
+      "sha256": "fae2101f62b7fe4e7731f40485d3079bfb2272d0098fe991d0eb9c76e6391eaf"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_follow.cpp",
+      "sha256": "d93e70cf3c7f52249f567c31e2f67baca687f04190b4848d1aaf62f851bf8578"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_follow.h",
+      "sha256": "a084bc93af2fa1bfdcdc322dd8487109bb22f094deed803357dcc779e772aeed"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_input_draw.cpp",
+      "sha256": "613b74843ebce9082f42e7f494c26c087f5c530c160d21e61d7e09a954eb3592"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/joystick_input_draw.h",
+      "sha256": "2c254fc10add2c7374dab8d0c924ab778f24b83ec93676cd7b919e8ba8f2b2fa"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/README.md",
+      "sha256": "cb5b1d28a59bfa6b66d5983d16bcd7456dd42aa18b7ec59d6a4e7e2a97da1c9f"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/remote_panel_draw.cpp",
+      "sha256": "573f035fc782144d460d0828343cf132fcc2d61cf1d10be45fc0fd083c883feb"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/remote_panel_draw.h",
+      "sha256": "ee84187a6da40c29069841d4fac6f6c777f83cc02ce17d9380bea8b3a7771f61"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_animation.cpp",
+      "sha256": "473108ccc60877c3f2811bb0cc908c93e8a2804bdde25d226539da28329bcd3b"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_animation.h",
+      "sha256": "5b62cbe0b043b8e64a42c2d7aba51aea33ceb13c1c75effd0c4da6dd5eae5e3a"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_config.hpp",
+      "sha256": "2ddbd2b6e15bdc2853091adb8be1ed8752165d23aa7441a04cfd28bff1d1b02e"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_memory.cpp",
+      "sha256": "a65105f080e15df0bfad1dbc31e7e88759250a1f6088eb9b847a7676bd842706",
+      "local_sha256": "0058466726b7f4101ba32ae7acf83eebcb1415519a7a9085a5adfb2d7c4768e1"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_memory.h",
+      "sha256": "18289c552e513763d8a5b886de99a3aaaa2581c4b58ef45d83b9bfdebb265460",
+      "local_sha256": "f0eface9380c62f55cf4363325e4c98a03549698965f9d9f590d9b323741ebdf"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_module_check.cpp",
+      "sha256": "a00f233ef212952306954805d1ff07d78fb4b36bd9312dfd3e3bb3bbab127e4b"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_port.cpp",
+      "sha256": "a88f02ef7d53f881ce57988871147a1639a0c25a8b954990e43c6851e03fb436"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_port.h",
+      "sha256": "9a4a24657364fbac12efc2058aa424475735d64350c606ef21c5e30ba2497301"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_project.hpp",
+      "sha256": "8dc8d8d6a9f39be481a622f8d381050efc8097dbfe9aeb47f40336a25fd7e7fb"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/smooth_single_context.hpp",
+      "sha256": "6eb0ae7b9adc9b9b828a3136eab66f0b157a703e9c00896566a83eb0c9cb180f"
+    },
+    {
+      "path": "Ports/smooth_ui_toolkit/patches/stm32-port.patch",
+      "sha256": "c25819d07612a3c163c4a395d4e2d67c2e57a2d4e54c8088409b84cbe1823f18"
+    },
+    {
+      "path": "Ports/showcase/CMakeLists.txt",
+      "sha256": "5449e88bb03190178605108a403e15a18525bcd321b7e882d29839596dffead4"
+    },
+    {
+      "path": "Ports/showcase/showcase_model.cpp",
+      "sha256": "56a0def84c529bda6b30e19bd60294b392d9b99dafcc40019c966d8db498f10e",
+      "local_sha256": "e810d83d1b3ffd675bf870e5f02ee85153b4c8c9276d3fa7c8876b4342b409a0"
+    },
+    {
+      "path": "Ports/showcase/showcase_model.h",
+      "sha256": "c0d71ccae04b041b592d606b9d4de95c2d3247bf365d21172b894ac130f0fb22",
+      "local_sha256": "8cdd0f4c2f2b38fa9a9467415da5ff745253e4f542acbf1d5b7b2a13c6805a7d"
+    },
+    {
+      "path": "OledRefresh/oled_refresh.c",
+      "source_path": "../oled_test/Core/Src/oled_refresh.c",
+      "sha256": "f16783c1d0bb07b7c9d1ade2c6acd81bc8185c6bd00e6c2e69dd701cc8c829b3",
+      "local_sha256": "29edd686fec06567c9adadb94c2c723b6beb840d8a3d8368ef532ed45f8e5865"
+    },
+    {
+      "path": "OledRefresh/oled_refresh.h",
+      "source_path": "../oled_test/Core/Inc/oled_refresh.h",
+      "sha256": "4de8e5f7c3e543382dc342196f0d180ed31187dd2687c528008fccb1efbe06a1",
+      "local_sha256": "35d9243b5883e368e1a571763bc8950372643be74beb8af9972fdcc1aeb16ee3"
+    },
+    {
+      "path": "OledRefresh/oled_frame_info.h",
+      "source_path": "../oled_test/Core/Inc/oled_frame_info.h",
+      "sha256": "a46450719f80a2be7ed51bede33371e90e36203217f4882a8525cd2d462924f7"
+    }
+  ],
+  "libraries": {
+    "astra": {
+      "repository": "https://github.com/AstraThreshold/oled-ui-astra",
+      "commit": "88716a62f84c41838458fd159841fe67e6a86f87"
+    },
+    "smooth_ui_toolkit": {
+      "repository": "https://github.com/Forairaaaaa/smooth_ui_toolkit",
+      "commit": "3cfe6a373edee2e325b8490491f921ecc71b29e6"
+    }
+  }
+}

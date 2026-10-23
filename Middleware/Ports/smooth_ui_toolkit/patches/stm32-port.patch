@@ -1,0 +1,631 @@
+--- a/src/core/animation/animate/animate.cpp
++++ b/src/core/animation/animate/animate.cpp
+@@ -57,7 +57,7 @@
+         _repeat_count = repeat;
+         _current_duration = 0.0f;
+         _playing_state = delay > 0 ? AnimateState::Delaying : AnimateState::Playing;
+-        get_key_frame_generator().done = false;
++        init();
+         _last_tick = ui_hal::get_tick_s();
+     }
+ }
+@@ -96,7 +96,11 @@
+     this->start = start;
+     this->end = end;
+     get_key_frame_generator().retarget(start, end);
+-    if (_playing_state != AnimateState::Paused) {
++    _current_duration = 0.0f;
++    _repeat_count = repeat;
++    if (_playing_state == AnimateState::Paused) {
++        _saved_state = delay > 0 ? AnimateState::Delaying : AnimateState::Playing;
++    } else {
+         _playing_state = AnimateState::Idle;
+         play();
+     }
+--- a/src/core/animation/animate_value/animate_value.cpp
++++ b/src/core/animation/animate_value/animate_value.cpp
+@@ -51,8 +51,8 @@
+     if (!_is_begin) {
+         return;
+     }
++    _default_value = value();
+     _is_begin = false;
+-    _default_value = value();
+ }
+ 
+ void AnimateValue::teleport(float newValue)
+--- a/src/core/animation/generators/easing/easing.cpp
++++ b/src/core/animation/generators/easing/easing.cpp
+@@ -17,7 +17,7 @@
+     done = false;
+     value = start;
+     _range = end - start;                          // 预计算差值
+-    _inv_duration = 1.0f / easingOptions.duration; // 预计算持续时间倒数
++    _inv_duration = easingOptions.duration > 0.0f ? 1.0f / easingOptions.duration : 0.0f; // 预计算持续时间倒数
+ }
+ 
+ void Easing::retarget(float start, float end)
+@@ -33,6 +33,7 @@
+         return done;
+     }
+ 
++    if (easingOptions.duration <= 0.0f) { value = end; done = true; return true; }
+     float progress = t * _inv_duration;
+     if (progress >= 1.0f) {
+         value = end;
+--- a/src/core/animation/generators/easing/easing.hpp
++++ b/src/core/animation/generators/easing/easing.hpp
+@@ -31,12 +31,12 @@
+     {
+         easingOptions.duration = duration;
+         easingOptions.easingFunction = easingFunction;
+-        _inv_duration = 1.0f / duration; // 更新持续时间倒数
++        _inv_duration = duration > 0.0f ? 1.0f / duration : 0.0f; // 更新持续时间倒数
+     }
+     inline void setEasingOptions(const EasingOptions_t& options)
+     {
+         easingOptions = options;
+-        _inv_duration = 1.0f / options.duration; // 更新持续时间倒数
++        _inv_duration = options.duration > 0.0f ? 1.0f / options.duration : 0.0f; // 更新持续时间倒数
+     }
+ 
+     virtual void init() override;
+@@ -49,7 +49,7 @@
+ 
+ private:
+     float _range = 0.0f;        // 缓存 end - start 的计算结果
+-    float _inv_duration = 1.0f; // 缓存 1.0f / duration 的计算结果
++    float _inv_duration = 1.0f; // 缓存 duration > 0.0f ? 1.0f / duration : 0.0f 的计算结果
+ };
+ 
+ } // namespace smooth_ui_toolkit
+--- a/src/core/animation/generators/spring/spring.cpp
++++ b/src/core/animation/generators/spring/spring.cpp
+@@ -45,6 +45,7 @@
+ {
+     done = false;
+     value = start;
++    _current_velocity = springOptions.velocity;
+ 
+     // If or duration or visualDuration is provided, set spring options by duration/bounce-based options
+     if (springOptions.duration > 0 || springOptions.visualDuration > 0) {
+@@ -64,26 +65,27 @@
+ 
+         // 欠阻尼 - 预计算速度公式系数
+         _velocity_c1 =
+-            (springOptions.velocity + _damping_ratio * _undamped_angular_freq * _initial_delta) / _damped_angular_freq;
++            (_damping_ratio * _undamped_angular_freq * _initial_delta - springOptions.velocity) / _damped_angular_freq;
+         _velocity_c2 = _initial_delta;
+     } else if (_damping_ratio == 1) {
+         _damping_type = DampingType::Critical;
+         // 临界阻尼 - 预计算速度公式系数
+-        _velocity_c1 = springOptions.velocity + _undamped_angular_freq * _initial_delta;
++        _velocity_c1 = _undamped_angular_freq * _initial_delta - springOptions.velocity;
+         _velocity_c2 = _initial_delta;
+     } else {
+         _damping_type = DampingType::Overdamped;
+-        // 过阻尼 - 预计算速度公式系数
+-        _damped_angular_freq = _undamped_angular_freq * std::sqrt(_damping_ratio * _damping_ratio - 1);
+-        _velocity_c1 =
+-            (springOptions.velocity + _damping_ratio * _undamped_angular_freq * _initial_delta) / _damped_angular_freq;
+-        _velocity_c2 = _damped_angular_freq * _initial_delta;
++        _damped_angular_freq = _undamped_angular_freq * std::sqrt(_damping_ratio * _damping_ratio - 1.0f);
++        // Real exponential modes avoid 0 * inf from exp(-a*t) * cosh(q*t).
++        const float b = (_damping_ratio * _undamped_angular_freq * _initial_delta -
++                         springOptions.velocity) / _damped_angular_freq;
++        _velocity_c1 = 0.5f * (_initial_delta + b);
++        _velocity_c2 = 0.5f * (_initial_delta - b);
+     }
+ }
+ 
+ void Spring::retarget(float start, float end)
+ {
+-    springOptions.velocity = -_current_velocity;
++    springOptions.velocity = _current_velocity;
+     this->start = start;
+     this->end = end;
+     init();
+@@ -103,6 +105,7 @@
+     bool isBelowVelocityThreshold = std::abs(_current_velocity) <= springOptions.restSpeed;
+     bool isBelowDisplacementThreshold = std::abs(end - value) <= springOptions.restDelta;
+     done = isBelowVelocityThreshold && isBelowDisplacementThreshold;
++    if (done) { value = end; _current_velocity = 0.0f; }
+ 
+     return done;
+ }
+@@ -123,17 +126,11 @@
+         float envelope = std::exp(-_undamped_angular_freq * t);
+         _current_velocity = envelope * (_undamped_angular_freq * (_velocity_c2 + _velocity_c1 * t) - _velocity_c1);
+     } else {
+-        // 过阻尼解析速度公式
+-        float envelope = std::exp(-_damping_ratio * _undamped_angular_freq * t);
+-        float freqForT = std::min(_damped_angular_freq * t, 300.0f);
+-        float sinh_term = std::sinh(freqForT);
+-        float cosh_term = std::cosh(freqForT);
+-
+-        _current_velocity =
+-            envelope *
+-            ((_damping_ratio * _undamped_angular_freq * (_velocity_c1 * sinh_term + _velocity_c2 * cosh_term)) /
+-                 _damped_angular_freq -
+-             (_velocity_c1 * cosh_term + _velocity_c2 * sinh_term));
++        const float ratio = _damping_ratio + std::sqrt(_damping_ratio * _damping_ratio - 1.0f);
++        const float slow = -_undamped_angular_freq / ratio;
++        const float fast = -_undamped_angular_freq * ratio;
++        _current_velocity = -slow * _velocity_c1 * std::exp(slow * t) -
++                            fast * _velocity_c2 * std::exp(fast * t);
+     }
+ }
+ 
+@@ -154,10 +151,9 @@
+             return end - std::exp(-_undamped_angular_freq * t) * (_velocity_c2 + _velocity_c1 * t);
+         }
+         case DampingType::Overdamped: {
+-            float envelope = std::exp(-_damping_ratio * _undamped_angular_freq * t);
+-            float freqForT = std::min(_damped_angular_freq * t, 300.0f);
+-            return (end - (envelope * (_velocity_c1 * std::sinh(freqForT) + _velocity_c2 * std::cosh(freqForT))) /
+-                              _damped_angular_freq);
++            const float ratio = _damping_ratio + std::sqrt(_damping_ratio * _damping_ratio - 1.0f);
++            return end - _velocity_c1 * std::exp(-_undamped_angular_freq / ratio * t) -
++                         _velocity_c2 * std::exp(-_undamped_angular_freq * ratio * t);
+         }
+     }
+     return end; // fallback
+--- a/src/core/animation/generators/spring/spring.hpp
++++ b/src/core/animation/generators/spring/spring.hpp
+@@ -57,7 +57,7 @@
+ protected:
+     float _damping_ratio;         // 阻尼比
+     float _undamped_angular_freq; // 未阻尼角频率
+-    float _current_velocity;      // 当前速度
++    float _current_velocity = 0.0f; // Defined before the first sampled frame.
+ 
+     // 移除function对象，使用内联计算
+     enum class DampingType { Underdamped, Critical, Overdamped } _damping_type;
+--- a/src/core/animation/sequence/animate_sequence.cpp
++++ b/src/core/animation/sequence/animate_sequence.cpp
+@@ -21,25 +21,35 @@
+ 
+ void AnimateSequence::play()
+ {
+-    if (_animate_value) {
+-        _animate_value->play();
++    if (_animate_value && !_is_done) {
++        _is_paused = false;
++        if (_animate_value->currentPlayingState() == AnimateState::Paused) {
++            _animate_value->play();
++        }
+         return;
+     }
+     // Reset index and create animate value
+     if (!_value_sequence.empty()) {
+         _current_index = 0;
+         _current_value = _value_sequence[_current_index];
+-        _animate_value = std::make_unique<AnimateValue>(_current_value);
++        if (!_animate_value) {
++            _animate_value = std::make_unique<AnimateValue>(_current_value);
++        }
++        _animate_value->teleport(_current_value);
+         if (_on_play) {
+             _on_play(*_animate_value);
+         }
++        _animate_value->init();
++        _animate_value->complete(); // Initial keyframe has no transition duration.
+         _repeat_count = repeat;
+         _is_done = false;
++        _is_paused = false;
+     }
+ }
+ 
+ void AnimateSequence::pause()
+ {
++    if (!_is_done) { _is_paused = true; }
+     if (_animate_value) {
+         _animate_value->pause();
+     }
+@@ -50,8 +60,9 @@
+     if (!_value_sequence.empty()) {
+         _current_value = _value_sequence.back();
+     }
+-    _animate_value.reset();
++    if (_animate_value) { _animate_value->cancel(); }
+     _is_done = true;
++    _is_paused = false;
+     if (_on_done) {
+         _on_done();
+     }
+@@ -60,10 +71,11 @@
+ void AnimateSequence::cancel()
+ {
+     if (!_value_sequence.empty()) {
+-        _current_value = _value_sequence[1];
++        _current_value = _value_sequence.front();
+     }
+-    _animate_value.reset();
++    if (_animate_value) { _animate_value->cancel(); }
+     _is_done = true;
++    _is_paused = false;
+     if (_on_done) {
+         _on_done();
+     }
+@@ -72,7 +84,8 @@
+ void AnimateSequence::update()
+ {
+     // If animate value instance exists
+-    if (_animate_value) {
++    if (_animate_value && !_is_done && !_is_paused &&
++        _animate_value->currentPlayingState() != AnimateState::Paused) {
+         _current_value = _animate_value->value();
+         // If animation is done, retarget to next value
+         if (_animate_value->done()) {
+@@ -92,7 +105,7 @@
+             else {
+                 // If repeat is not set, stop the animation
+                 if (_repeat_count == 0) {
+-                    _animate_value.reset();
++                    if (_animate_value) { _animate_value->cancel(); }
+                     _is_done = true;
+                     if (_on_done) {
+                         _on_done();
+@@ -110,6 +123,7 @@
+                 _current_index = 0;
+                 _current_value = _value_sequence[_current_index];
+                 _animate_value->teleport(_current_value);
++                _animate_value->complete(); // No delay at the repeated initial keyframe.
+             }
+         }
+     }
+--- a/src/core/animation/sequence/animate_sequence.hpp
++++ b/src/core/animation/sequence/animate_sequence.hpp
+@@ -52,6 +52,8 @@
+ 
+     void setSequence(const std::initializer_list<float>& valueSequence)
+     {
++        cancel();
++        _value_sequence.clear();
+         _value_sequence.reserve(valueSequence.size());
+         for (const auto& v : valueSequence) {
+             _value_sequence.push_back(v);
+@@ -60,6 +62,8 @@
+     template <typename T>
+     void setSequence(const std::vector<T>& valueSequence)
+     {
++        cancel();
++        _value_sequence.clear();
+         _value_sequence.reserve(valueSequence.size());
+         for (const auto& v : valueSequence) {
+             _value_sequence.push_back(static_cast<float>(v));
+@@ -105,6 +109,7 @@
+     int _current_index = 0;
+     int _repeat_count = 0;
+     bool _is_done = true;
++    bool _is_paused = false;
+ 
+     std::vector<float> _value_sequence;
+     std::unique_ptr<AnimateValue> _animate_value;
+--- a/src/core/core.hpp
++++ b/src/core/core.hpp
+@@ -17,5 +17,10 @@
+ #include "easing/cubic_bezier/cubic_bezier.hpp"
+ #include "easing/ease.hpp"
+ #include "hal/hal.hpp"
++#ifndef SMOOTH_UI_TOOLKIT_ENABLE_COLOR
++#define SMOOTH_UI_TOOLKIT_ENABLE_COLOR 1
++#endif
++#if SMOOTH_UI_TOOLKIT_ENABLE_COLOR
+ #include "color/color.hpp"
++#endif
+ #include "math/math.hpp"
+--- a/src/games/core/frame_clock.hpp
++++ b/src/games/core/frame_clock.hpp
+@@ -17,9 +17,11 @@
+ public:
+     void tick()
+     {
+-        _current = ui_hal::get_tick_s();
+-        _dt = _current - _last;
+-        _last = _current;
++        const uint32_t now = ui_hal::get_tick();
++        _current = static_cast<float>(now) / 1000.0f;
++        _dt = _has_tick ? static_cast<float>(now - _last_tick) / 1000.0f : 0.0f;
++        _last_tick = now;
++        _has_tick = true;
+     }
+ 
+     float dt() const
+@@ -33,7 +35,8 @@
+ 
+ private:
+     float _current = 0.0f;
+-    float _last = 0.0f;
++    uint32_t _last_tick = 0;
++    bool _has_tick = false;
+     float _dt = 0.0f;
+ };
+ 
+--- a/src/games/core/system/collision.hpp
++++ b/src/games/core/system/collision.hpp
+@@ -119,7 +119,7 @@
+ 
+ inline static bool is_colliding(const Shape& a, const Shape& b)
+ {
+-    return CollideTable[(int)a.type()][(int)b.type()](a, b);
++    return CollideTable[(int)a.shapeType()][(int)b.shapeType()](a, b);
+ }
+ 
+ } // namespace collision
+--- a/src/tools/event/event_queue.hpp
++++ b/src/tools/event/event_queue.hpp
+@@ -11,7 +11,15 @@
+ #pragma once
+ #include <functional>
+ #include <queue>
++#ifdef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++#include "smooth_single_context.hpp"
++#else
+ #include <mutex>
++#endif
++
++#ifndef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++namespace smooth_platform { using Mutex = std::mutex; using LockGuard = std::lock_guard<Mutex>; }
++#endif
+ 
+ namespace smooth_ui_toolkit {
+ 
+@@ -23,18 +31,18 @@
+ template <typename T>
+ class EventQueue {
+ public:
+-    std::mutex mutex;
++    smooth_platform::Mutex mutex;
+     std::queue<T> events;
+ 
+     void emit(const T& event)
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         events.push(event);
+     }
+ 
+     void poll(std::function<void(const T&)> onEvent)
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         while (!events.empty()) {
+             onEvent(events.front());
+             events.pop();
+@@ -43,25 +51,25 @@
+ 
+     T front()
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         return events.front();
+     }
+ 
+     void pop()
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         events.pop();
+     }
+ 
+     bool empty()
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         return events.empty();
+     }
+ 
+     size_t size()
+     {
+-        std::lock_guard<std::mutex> lock(mutex);
++        smooth_platform::LockGuard lock(mutex);
+         return events.size();
+     }
+ };
+--- a/src/tools/event/signal.hpp
++++ b/src/tools/event/signal.hpp
+@@ -11,8 +11,16 @@
+ #pragma once
+ #include <functional>
+ #include <vector>
++#ifdef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++#include "smooth_single_context.hpp"
++#else
+ #include <mutex>
++#endif
+ #include <algorithm>
++
++#ifndef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++namespace smooth_platform { using Mutex = std::mutex; using LockGuard = std::lock_guard<Mutex>; }
++#endif
+ 
+ namespace smooth_ui_toolkit {
+ 
+@@ -28,7 +36,7 @@
+ 
+     void emit(Args... args)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         for (auto& [id, slot] : _slots) {
+             slot(args...);
+         }
+@@ -36,7 +44,7 @@
+ 
+     size_t connect(const SlotType& slot)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         size_t id = ++_last_id;
+         _slots.push_back({id, slot});
+         return id;
+@@ -44,7 +52,7 @@
+ 
+     void disconnect(size_t id)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         _slots.erase(std::remove_if(_slots.begin(),
+                                     _slots.end(),
+                                     [id](auto& pair) {
+@@ -55,14 +63,14 @@
+ 
+     void clear()
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         _slots.clear();
+     }
+ 
+ private:
+     std::vector<std::pair<size_t, SlotType>> _slots;
+     size_t _last_id = 0;
+-    std::mutex _mutex;
++    smooth_platform::Mutex _mutex;
+ };
+ 
+ template <>
+--- a/src/tools/random/random.hpp
++++ b/src/tools/random/random.hpp
+@@ -9,14 +9,27 @@
+  *
+  */
+ #pragma once
++#ifndef SMOOTH_UI_TOOLKIT_ENABLE_COLOR
++#define SMOOTH_UI_TOOLKIT_ENABLE_COLOR 1
++#endif
++#if SMOOTH_UI_TOOLKIT_ENABLE_COLOR
+ #include "core/color/color.hpp"
++#endif
++#ifdef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++#include "smooth_single_context.hpp"
++#else
+ #include <mutex>
++#endif
+ #include <random>
+ #include <vector>
+ #include <cassert>
+ 
+ #ifdef ESP_PLATFORM
+ #include <esp_random.h>
++#endif
++
++#ifndef SMOOTH_UI_TOOLKIT_SINGLE_CONTEXT
++namespace smooth_platform { using Mutex = std::mutex; using LockGuard = std::lock_guard<Mutex>; }
+ #endif
+ 
+ namespace smooth_ui_toolkit {
+@@ -31,7 +44,7 @@
+ 
+     int getInt(int a, int b)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         if (a > b) {
+             std::swap(a, b);
+         }
+@@ -40,7 +53,7 @@
+ 
+     float getFloat(float a, float b)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         if (a > b) {
+             std::swap(a, b);
+         }
+@@ -49,13 +62,14 @@
+ 
+     double getDouble(double a, double b)
+     {
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         if (a > b) {
+             std::swap(a, b);
+         }
+         return std::uniform_real_distribution<double>{a, b}(_rng);
+     }
+ 
++#if SMOOTH_UI_TOOLKIT_ENABLE_COLOR
+     color::Rgb_t getRgbColor()
+     {
+         color::Rgb_t color;
+@@ -65,22 +79,26 @@
+         return color;
+     }
+ 
++#endif
++
+     template <typename T>
+     const T& choice(const std::vector<T>& vec)
+     {
+         assert(!vec.empty());
+-        std::lock_guard<std::mutex> lock(_mutex);
++        smooth_platform::LockGuard lock(_mutex);
+         std::uniform_int_distribution<size_t> dist(0, vec.size() - 1);
+         return vec[dist(_rng)];
+     }
+ 
+ private:
+     std::mt19937 _rng;
+-    std::mutex _mutex;
++    smooth_platform::Mutex _mutex;
+ 
+     Random()
+     {
+-#ifdef ESP_PLATFORM
++#ifdef SMOOTH_UI_TOOLKIT_RANDOM_SEED
++        _rng.seed(SMOOTH_UI_TOOLKIT_RANDOM_SEED);
++#elif defined(ESP_PLATFORM)
+         _rng.seed(esp_random());
+ #else
+         std::random_device rd;
+--- a/src/widget/select_menu/smooth_options.cpp
++++ b/src/widget/select_menu/smooth_options.cpp
+@@ -60,7 +60,7 @@
+ 
+ void SmoothOptionsMenu::moveTo(int optionIndex)
+ {
+-    if (optionIndex < 0 || optionIndex > (_data.option_list.size() - 1)) {
++    if (optionIndex < 0 || static_cast<size_t>(optionIndex) >= _data.option_list.size()) {
+         return;
+     }
+ 
+@@ -71,7 +71,7 @@
+ 
+ void SmoothOptionsMenu::jumpTo(int optionIndex)
+ {
+-    if (optionIndex < 0 || optionIndex > (_data.option_list.size() - 1)) {
++    if (optionIndex < 0 || static_cast<size_t>(optionIndex) >= _data.option_list.size()) {
+         return;
+     }
+ 
+--- a/src/widget/select_menu/smooth_selector.cpp
++++ b/src/widget/select_menu/smooth_selector.cpp
+@@ -47,7 +47,7 @@
+ 
+ void SmoothSelectorMenu::moveTo(int optionIndex)
+ {
+-    if (optionIndex < 0 || optionIndex > (_data.option_list.size() - 1)) {
++    if (optionIndex < 0 || static_cast<size_t>(optionIndex) >= _data.option_list.size()) {
+         return;
+     }
+ 
+@@ -60,14 +60,14 @@
+ 
+ void SmoothSelectorMenu::jumpTo(int optionIndex)
+ {
+-    if (optionIndex < 0 || optionIndex > (_data.option_list.size() - 1)) {
++    if (optionIndex < 0 || static_cast<size_t>(optionIndex) >= _data.option_list.size()) {
+         return;
+     }
+ 
+     // Update tarnsition target
+     _data.selected_option_index = optionIndex;
+-    _data.selector_postion.move(_data.option_list[optionIndex].keyframe.x, _data.option_list[optionIndex].keyframe.y);
+-    _data.selector_shape.move(_data.option_list[optionIndex].keyframe.width,
++    _data.selector_postion.teleport(_data.option_list[optionIndex].keyframe.x, _data.option_list[optionIndex].keyframe.y);
++    _data.selector_shape.teleport(_data.option_list[optionIndex].keyframe.width,
+                               _data.option_list[optionIndex].keyframe.height);
+ }
+ 

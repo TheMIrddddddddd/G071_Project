@@ -1,0 +1,5 @@
+add_library(oled_showcase STATIC showcase_model.cpp)
+target_include_directories(oled_showcase PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+target_link_libraries(oled_showcase PUBLIC oled_astra oled_smooth_upstream oled_u8g2_port)
+target_compile_features(oled_showcase PUBLIC cxx_std_17)
+target_compile_options(oled_showcase PRIVATE -Wall -Wextra -Werror)

@@ -1,0 +1,6 @@
+#pragma once
+#include <cmath>
+// M_PI is an upstream dependency, not part of ISO C++17/newlib strict mode.
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif

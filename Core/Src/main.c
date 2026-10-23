@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "board_usart.h"
+#include "app_main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,7 +35,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_LOG_PERIOD_MS 1000U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,44 +45,15 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-static uint32_t uart_log_last_tick;
-static uint32_t uart_log_count;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-static void UART_LogInit(void);
-static void UART_LogPoll(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static void UART_LogInit(void)
-{
-  board_usart3_init();
-  uart_log_last_tick = HAL_GetTick();
-  (void)board_usart3_printf("\r\n[BOOT] STM32G071 started\r\n");
-  (void)board_usart3_printf("[BOOT] SYSCLK=%lu Hz\r\n",
-                       (unsigned long)HAL_RCC_GetSysClockFreq());
-  (void)board_usart3_printf("[BOOT] USART3: 115200 8N1, TX=DMA+ring, RX=DMA+IDLE+ring\r\n");
-}
-
-static void UART_LogPoll(void)
-{
-  board_usart3_poll();
-  const uint32_t now = HAL_GetTick();
-  if ((uint32_t)(now - uart_log_last_tick) >= UART_LOG_PERIOD_MS)
-  {
-    uart_log_last_tick = now;
-    uart_log_count++;
-    (void)board_usart3_printf("[RUN] count=%lu tick=%lu tx_fail=%lu tx_drop=%lu rx=%lu\r\n",
-                         (unsigned long)uart_log_count, (unsigned long)now,
-                         (unsigned long)board_usart3_stats.tx_errors,
-                         (unsigned long)board_usart3_stats.tx_dropped_messages,
-                         (unsigned long)board_usart3_stats.rx_bytes);
-  }
-}
 /* USER CODE END 0 */
 
 /**
@@ -119,7 +89,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  UART_LogInit();
+  app_main_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -129,7 +99,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    UART_LogPoll();
+    app_main_poll();
   }
   /* USER CODE END 3 */
 }
