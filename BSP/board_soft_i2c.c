@@ -1,8 +1,9 @@
 #include "board_soft_i2c.h"
 #include "tim.h"
 
-/* Conservative Standard-mode timing. GPIO/software overhead and IRQs extend
-   phases; actual bus rate must be measured. Never mask IRQs for a transaction. */
+/* Each phase waits 3 TIM2 counts (1 us/count), plus GPIO/software/IRQ overhead.
+   Measure actual bus timing; this setting alone does not guarantee Standard-mode.
+   Never mask IRQs for a transaction. */
 #define I2C_PHASE_US       3U
 #define I2C_SCL_TIMEOUT_US 2000U
 static uint8_t initialized;

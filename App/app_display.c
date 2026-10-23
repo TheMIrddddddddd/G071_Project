@@ -22,7 +22,9 @@ void app_display_init(uint64_t now)
   uint8_t *bootstrap=0;(void)OLED_RefreshBeginDraw(&refresh,&bootstrap);
   bool ok=app_ui_init(now,bootstrap);(void)OLED_RefreshCancelDraw(&refresh);
   (void)board_usart3_printf("[UI] mode=%s init=%s heap_peak=%lu pool=2048\r\n",
-#if APP_SHOWCASE
+#if APP_LAYOUT
+    "LAYOUT",
+#elif APP_SHOWCASE
     "SHOWCASE",
 #else
     "STATUS",
@@ -45,9 +47,9 @@ void app_display_poll(uint64_t now)
   uint32_t cost=duration(begin);if(cost>max_model_us)max_model_us=cost;
   if(app_ui_failed()&&!ui_error_reported)
   {ui_error_reported=true;(void)board_usart3_printf("[UI] initialization/allocation failed; fallback status, RGB/UART remain active\r\n");}
-  /* Model time is independent of transfers. Bound rasterization rate to 30Hz;
+  /* Model time is independent of transfers. Select raster cadence by UI mode;
      overwrite the pending slot with the newest complete snapshot, never active. */
-  uint64_t period=APP_SHOWCASE?33333U:1000000U;
+  uint64_t period=APP_LAYOUT?40000U:(APP_SHOWCASE?33333U:1000000U);
   if(!sequence||now-last_draw>=period)
   {
     last_draw=now;uint8_t *draw=0;

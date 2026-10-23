@@ -2,6 +2,10 @@
 #define APP_UI_H
 #include <stdint.h>
 #include <stdbool.h>
+/* Enabled by the LAYOUT build mode; existing host SHOWCASE tests default off. */
+#ifndef APP_LAYOUT
+#define APP_LAYOUT 0
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

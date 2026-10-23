@@ -14,7 +14,7 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "APP_DISPLAY_MODE": "SHOWCASE"
+                "APP_DISPLAY_MODE": "LAYOUT"
             }
         },
         {
@@ -30,7 +30,7 @@
             "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "APP_DISPLAY_MODE": "SHOWCASE"
+                "APP_DISPLAY_MODE": "LAYOUT"
             }
         },
         {

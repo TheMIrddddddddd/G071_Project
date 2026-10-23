@@ -14,7 +14,7 @@ env = dict(os.environ)
 env["PATH"] = str(gcc.parent) + os.pathsep + env.get("PATH", "")
 def run(args):
     subprocess.run([str(x) for x in args], cwd=root, env=env, check=True)
-for suite in ("showcase", "app"):
+for suite in ("showcase", "app", "layout"):
     build = root / "build" / (suite + "-tests")
     run([cmake, "-S", root / "tests" / suite, "-B", build, "-G", "Ninja",
          "-DCMAKE_C_COMPILER=" + str(gcc), "-DCMAKE_CXX_COMPILER=" + str(gcc.parent / "g++.exe"),
