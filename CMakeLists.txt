@@ -45,11 +45,15 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    BSP/board_usart.c
+    Middleware/Ringbuffer/src/ringbuffer.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    BSP
+    Middleware/Ringbuffer/inc
 )
 
 # Add project symbols (macros)

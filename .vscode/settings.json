@@ -1,8 +1,9 @@
 {
-    "cmake.cmakePath": "C:/ST/STM32CubeCLT_1.20.0/CMake/bin/cmake.exe",
+    "cmake.cmakePath": "cube-cmake",
     "cmake.useCMakePresets": "always",
     "cmake.configureArgs": [
-        "-DCMAKE_MAKE_PROGRAM=C:/ST/STM32CubeCLT_1.20.0/Ninja/bin/ninja.exe"
+        "-DCMAKE_MAKE_PROGRAM=C:/ST/STM32CubeCLT_1.20.0/Ninja/bin/ninja.exe",
+        "-DCMAKE_COMMAND=cube-cmake"
     ],
     "cmake.environment": {
         "PATH": "C:/ST/STM32CubeCLT_1.20.0/GNU-tools-for-STM32/bin;C:/ST/STM32CubeCLT_1.20.0/Ninja/bin;${env:PATH}"

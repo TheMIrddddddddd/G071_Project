@@ -55,3 +55,29 @@ OpenOCD 的 G0 默认 reset-init 会切到 64 MHz，本工程覆盖该钩子，�
 - 读取 Flash 容量寄存器（`0x1FFF75E0`）得到 `0x0080`，对应 128 KiB。
 - Flash 驱动探测通过，识别为 STM32G07/G08xx，128 KiB 单 Bank，RDP Level 0；未执行解锁操作。
 - 本次只验证探针初始化、SWD 通信及寄存器读取，没有执行下载、擦除、复位或程序断点测试。芯片封装和完整订货型号仍以 `.ioc` 配置及实物标记为准。
+
+## USART3 当前日志实现
+
+当前已改为 TX DMA + 环形队列、RX 循环 DMA + IDLE/HT/TC + 接收环形缓冲。详见 [USART3 DMA 日志说明](../Docs/USART3_DMA_LOG.md)。
+调试时观察 `uart_log_count` 和 `board_usart3_stats`；旧版 `uart_log_tx_busy`、`uart_log_tx_complete`、`uart_log_failures` 已由模块统计替代。编译烧录调试入口不变。
+
+## 首版 USART3 中断打印测试（历史记录）
+
+测试逻辑放在 `Core/Src/main.c` 的 CubeMX 用户区，不改变时钟、引脚和中断配置。
+USART3 发送由该测试独占；主循环格式化日志并调用 `HAL_UART_Transmit_IT()`，完成回调只置标志。
+192 B 静态发送缓冲区在完成回调或发送终止前保持不变。失败后间隔 10 ms 重试，250 ms 未完成则在前台终止发送并重试同一条消息。
+
+串口连接：PB8/TX → USB 转串口 RXD，GND 共地；115200、8N1、无流控。USB 串口需要实际接到 PB8 才能收到日志。
+正常输出示例（tick 为实际毫秒计数）：
+
+```text
+[BOOT] STM32G071 started
+[BOOT] SYSCLK=16000000 Hz
+[BOOT] USART3: 115200 8N1, PB8=TX PB9=RX, TX=IT
+[RUN] count=1 tick=1000 tx_fail=0
+[RUN] count=2 tick=2000 tx_fail=0
+```
+
+验收：启动信息出现一次，随后每秒递增计数，连续观察至少一分钟，无乱码、重启或停顿，正常时 `tx_fail=0`。计时比较使用无符号差值以处理 HAL tick 回绕。
+
+2026-10-22 源码及构建验证：Debug 编译链接通过，Flash 15804 B，RAM 2360 B（含堆、栈预留）；本次应用代码通过 `-Wall -Wextra -Werror -Wformat=2 -Wconversion -fanalyzer` 编译检查，厂商头文件按系统头处理。已确认自定义发送完成回调进入 ELF。本轮未烧录，尚无这版日志的板级输出证据。
