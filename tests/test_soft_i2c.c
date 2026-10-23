@@ -131,10 +131,10 @@ int main(void)
   reset_bus();
   assert(board_soft_i2c_probe(0x3C) == BOARD_I2C_OK);
   assert(starts == 1 && stops == 1 && bytes[0] == 0x78 && scl && sda);
-  /* Model has zero GPIO call overhead. Each data bit needs one low wait and
+  /* Current profile uses 3 us phases. Model has zero GPIO call overhead. Each data bit needs one low wait and
      one high wait; allow counter-read overhead, reject duplicate low waits. */
-  assert(max_data_period >= 12U && max_data_period <= 18U);
-  assert(min_data_low >= 6U && min_data_high >= 6U);
+  assert(max_data_period >= 6U && max_data_period <= 12U);
+  assert(min_data_low >= 3U && min_data_high >= 3U);
   reset_bus(); nack_byte = 1;
   assert(board_soft_i2c_probe(0x45) == BOARD_I2C_ADDRESS_NACK);
   assert(bytes[0] == 0x8A && stops == 1);

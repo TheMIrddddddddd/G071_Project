@@ -3,7 +3,7 @@
 
 /* Conservative Standard-mode timing. GPIO/software overhead and IRQs extend
    phases; actual bus rate must be measured. Never mask IRQs for a transaction. */
-#define I2C_PHASE_US       6U
+#define I2C_PHASE_US       3U
 #define I2C_SCL_TIMEOUT_US 2000U
 static uint8_t initialized;
 

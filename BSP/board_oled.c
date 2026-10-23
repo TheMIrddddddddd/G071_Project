@@ -4,7 +4,7 @@
 
 #define OLED_COLUMN_OFFSET 2U
 #define OLED_RAM_COLUMNS 132U
-#define OLED_CHUNK_SIZE 32U
+#define OLED_CHUNK_SIZE OLED_REFRESH_CHUNK_BYTES
 /* From oled_test/Core/Src/oled_display.c: keep panel orientation and contrast.
    20/02 is retained from that proven legacy sequence, not interpreted as an
    SH1106 horizontal-addressing command. Actual writes always set page/column. */
@@ -52,20 +52,23 @@ static board_i2c_status_t data_chunk(uint8_t clear)
   if (!clear && active_plan)
   {
     span_offset = (uint16_t)(span_offset + length);
-    if (span_offset == active_plan->spans[span_index].length)
-    { span_index++; span_offset = 0U; }
+    const uint8_t span_done = (span_offset == active_plan->spans[span_index].length);
+    if (span_done) { span_index++; span_offset = 0U; }
     if (span_index == active_plan->span_count)
       status.state = BOARD_OLED_READY;
     else
     {
       status.page = active_plan->spans[span_index].page;
       status.column = (uint8_t)(active_plan->spans[span_index].column + span_offset);
-      status.state = BOARD_OLED_FRAME_POSITION;
+      /* SH1106 retains its auto-incremented column across STOP/START.
+         Only a new span needs page/column commands; RGB uses another address. */
+      status.state = span_done ? BOARD_OLED_FRAME_POSITION : BOARD_OLED_FRAME_DATA;
     }
     return BOARD_I2C_OK;
   }
   status.column = (uint8_t)(status.column + length);
-  if (status.column == width)
+  const uint8_t page_done = (status.column == width);
+  if (page_done)
   {
     status.column = 0U;
     status.page++;
@@ -76,7 +79,10 @@ static board_i2c_status_t data_chunk(uint8_t clear)
     status.state = clear ? BOARD_OLED_FRAME_POSITION :
                    (panel_on ? BOARD_OLED_READY : BOARD_OLED_DISPLAY_ON);
   }
-  else status.state = clear ? BOARD_OLED_CLEAR_POSITION : BOARD_OLED_FRAME_POSITION;
+  else if (page_done)
+    status.state = clear ? BOARD_OLED_CLEAR_POSITION : BOARD_OLED_FRAME_POSITION;
+  else
+    status.state = clear ? BOARD_OLED_CLEAR_DATA : BOARD_OLED_FRAME_DATA;
   return BOARD_I2C_OK;
 }
 

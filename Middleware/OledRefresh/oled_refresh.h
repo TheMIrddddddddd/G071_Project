@@ -13,7 +13,9 @@ extern "C" {
 #define OLED_REFRESH_PAGES 8U
 #define OLED_REFRESH_FRAME_BYTES (OLED_REFRESH_WIDTH * OLED_REFRESH_PAGES)
 #define OLED_REFRESH_MAX_SPANS 128U
-#define OLED_REFRESH_SPAN_OVERHEAD 7U
+#define OLED_REFRESH_POSITION_BYTES 5U /* Address + control + page/column. */
+#define OLED_REFRESH_DATA_OVERHEAD 2U  /* Address + data control per chunk. */
+#define OLED_REFRESH_SPAN_OVERHEAD (OLED_REFRESH_POSITION_BYTES + OLED_REFRESH_DATA_OVERHEAD)
 #define OLED_REFRESH_CHUNK_BYTES 32U
 
 typedef enum {
@@ -77,8 +79,10 @@ typedef struct {
 } OLED_Refresh;
 
 /* Pure planner. Format: byte[page * 128 + x], bit 0 is y=page*8.
- * Spans are sent in <=32-byte chunks, each with a position command:
- * length+7*ceil(length/32) wire bytes, 2*ceil(length/32) transactions.
+ * Spans are positioned once, then sent in <=32-byte data transactions.
+ * Column auto-increments across STOP/START; each new span is positioned again.
+ * length+5+2*ceil(length/32) wire bytes, 1+ceil(length/32) transactions.
+ * Chunk size and protocol overhead constants are shared with the BSP driver.
  * Wire counts exclude START/STOP bit timing, include address bytes/ACK clocks
  * indirectly when the caller multiplies wire_bytes by 9.
  * Unknown shadow and FULL mode always produce eight full-page spans. */

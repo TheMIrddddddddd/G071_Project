@@ -17,8 +17,9 @@ static void AppendSpan(OLED_RefreshPlan *plan, uint8_t page,
     plan->span_count++;
     plan->image_bytes = (uint16_t)(plan->image_bytes + length);
     uint16_t chunks = (uint16_t)((length + OLED_REFRESH_CHUNK_BYTES - 1U) / OLED_REFRESH_CHUNK_BYTES);
-    plan->wire_bytes = (uint16_t)(plan->wire_bytes + length + chunks * OLED_REFRESH_SPAN_OVERHEAD);
-    plan->transactions = (uint16_t)(plan->transactions + 2U * chunks);
+    plan->wire_bytes = (uint16_t)(plan->wire_bytes + length + OLED_REFRESH_POSITION_BYTES
+                                  + chunks * OLED_REFRESH_DATA_OVERHEAD);
+    plan->transactions = (uint16_t)(plan->transactions + 1U + chunks);
 }
 
 static void FullPlan(OLED_RefreshPlan *plan)
@@ -102,7 +103,9 @@ OLED_RefreshResult OLED_RefreshBuildPlan(const uint8_t *image,
     /* Sparse changes spanning a whole page may already become one 128-byte
      * span. A fully spread frame at full cost takes exactly the full path. */
     if (plan->wire_bytes >= OLED_REFRESH_FRAME_BYTES
-        + OLED_REFRESH_PAGES * (OLED_REFRESH_WIDTH / OLED_REFRESH_CHUNK_BYTES) * OLED_REFRESH_SPAN_OVERHEAD) {
+        + OLED_REFRESH_PAGES * (OLED_REFRESH_POSITION_BYTES
+          + ((OLED_REFRESH_WIDTH + OLED_REFRESH_CHUNK_BYTES - 1U) / OLED_REFRESH_CHUNK_BYTES)
+            * OLED_REFRESH_DATA_OVERHEAD)) {
         FullPlan(plan);
     }
     return OLED_REFRESH_OK;

@@ -42,8 +42,8 @@ static uint16_t OraclePage(const uint8_t *a, const uint8_t *b,
         for (uint16_t start = 0U; start < end; ++start) {
             uint16_t length=(uint16_t)(positions[end-1U]-positions[start]+1U);
             uint16_t chunks=(uint16_t)((length+31U)/32U);
-            uint16_t candidate = (uint16_t)(cost[start] + length + 7U*chunks);
-            uint16_t txn = (uint16_t)(count[start] + 2U*chunks);
+            uint16_t candidate = (uint16_t)(cost[start] + length + 5U + 2U*chunks);
+            uint16_t txn = (uint16_t)(count[start] + 1U + chunks);
             if (candidate < cost[end]
                 || (candidate == cost[end] && txn < count[end])) {
                 cost[end] = candidate;
@@ -107,12 +107,12 @@ static void CheckPlan(const uint8_t *image, const uint8_t *baseline)
     CHECK(memcmp(applied, image, sizeof(applied)) == 0);
     CHECK(changed == plan->changed_bytes);
     CHECK(bytes == plan->image_bytes);
-    CHECK(plan->wire_bytes == bytes + 7U * chunks);
-    CHECK(plan->transactions == 2U * chunks);
+    CHECK(plan->wire_bytes == bytes + 5U * plan->span_count + 2U * chunks);
+    CHECK(plan->transactions == plan->span_count + chunks);
     /* Gap-merging is deliberately a bounded heuristic under 32-byte chunks;
        the independent optimum is a lower bound, not an optimality promise. */
     CHECK(plan->wire_bytes >= oracle_wire);
-    CHECK(plan->wire_bytes <= 1248U);
+    CHECK(plan->wire_bytes <= 1128U);
     if(plan->wire_bytes == oracle_wire) CHECK(plan->transactions >= oracle_txn);
     CHECK(result == (changed != 0U ? OLED_REFRESH_OK : OLED_REFRESH_NO_CHANGE));
     ++checks;
@@ -131,8 +131,8 @@ static void TestPlanner(void)
           == OLED_REFRESH_BAD_ARGUMENT);
     CHECK(OLED_RefreshBuildPlan(image, NULL, false, OLED_REFRESH_DIFF, &plan)
           == OLED_REFRESH_OK);
-    CHECK(plan.full && plan.image_bytes == 1024U && plan.wire_bytes == 1248U
-          && plan.transactions == 64U && plan.span_count == 8U);
+    CHECK(plan.full && plan.image_bytes == 1024U && plan.wire_bytes == 1128U
+          && plan.transactions == 40U && plan.span_count == 8U);
     CHECK(OLED_RefreshBuildPlan(image, baseline, true, OLED_REFRESH_FULL, &plan)
           == OLED_REFRESH_OK);
     CHECK(plan.full && plan.changed_bytes == 0U && plan.image_bytes == 1024U);
@@ -172,7 +172,7 @@ static void TestPlanner(void)
     CheckPlan(image, baseline);
     CHECK(OLED_RefreshBuildPlan(image, baseline, true, OLED_REFRESH_DIFF, &plan)
           == OLED_REFRESH_OK);
-    CHECK(plan.full && plan.span_count == 8U && plan.transactions == 64U);
+    CHECK(plan.full && plan.span_count == 8U && plan.transactions == 40U);
 
     memset(image, 0, sizeof(image));
     for (uint32_t mask = 0U; mask < UINT32_C(65536); ++mask) {
