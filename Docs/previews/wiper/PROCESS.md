@@ -10,4 +10,4 @@ Extract the windshield wiper symbol from this photograph as a clean BLACK INK ve
 
 128×64，纯黑白，40 ms 一帧。转轴按用户红点移到下方中央 `(64,51)`，雨刮臂长 35 像素，左右各摆动 64°，总范围 128°。关闭静止 800 ms，开启后连续四轮往复（每轮 1200 ms），关闭并停靠左侧 800 ms，总计 6400 ms。程序验证固定轮廓每帧一致、关闭时像素不变、循环首尾停靠位置一致。
 
-运行 `python scripts/render_wiper_preview.py` 可重新生成静态图和 GIF。本文件记录预览资源的制作过程；最终动画已通过 `App/app_wiper_icon.cpp` 接入第四个状态栏位置，构建和验证记录见 `Docs/G071_DISPLAY_FRAMEWORK.md`。
+运行 `python scripts/render_wiper_preview.py` 可重新生成静态图和 GIF。本文件记录预览资源的制作过程；最终动画已通过 `App/ui/components/icons/app_wiper_icon.cpp` 接入第四个状态栏位置，构建和验证记录见 `Docs/G071_DISPLAY_FRAMEWORK.md`。

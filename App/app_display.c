@@ -38,11 +38,9 @@ static void invalidate(void)
   else (void)OLED_RefreshInvalidate(&refresh);
   restart=true;
 }
-void app_display_poll(uint64_t now)
+/* Advance the UI independently of OLED transfers and publish the latest frame. */
+static void update_and_draw(uint64_t now)
 {
-  uint32_t ms=(uint32_t)(now/1000U);
-  if(generation!=app_bus_status()->generation)
-  {generation=app_bus_status()->generation;invalidate();}
   uint64_t begin=board_time_us();(void)app_ui_update(now);
   uint32_t cost=duration(begin);if(cost>max_model_us)max_model_us=cost;
   if(app_ui_failed()&&!ui_error_reported)
@@ -66,6 +64,11 @@ void app_display_poll(uint64_t now)
       } else (void)OLED_RefreshCancelDraw(&refresh);
     }
   }
+}
+
+/* Process at most one OLED transfer step, then select the next pending frame. */
+static void poll_oled(uint32_t ms)
+{
   if(!app_bus_status()->blocked)
   {
     board_oled_poll();board_oled_status_t state=board_oled_status();
@@ -96,6 +99,10 @@ void app_display_poll(uint64_t now)
       else if(selected==OLED_REFRESH_NO_CHANGE)skipped++;
     }
   }
+}
+
+static void report_statistics(uint64_t now)
+{
   if(now-report_tick>=5000000U)
   {
     report_tick=now;
@@ -109,4 +116,14 @@ void app_display_poll(uint64_t now)
       (unsigned long)max_model_us,(unsigned long)max_draw_us,(unsigned long)app_rgb_status()->max_late_ms,
       (unsigned long)board_usart3_stats.tx_dropped_messages,(unsigned long)app_ui_heap_peak());
   }
+}
+
+void app_display_poll(uint64_t now)
+{
+  uint32_t ms=(uint32_t)(now/1000U);
+  if(generation!=app_bus_status()->generation)
+  {generation=app_bus_status()->generation;invalidate();}
+  update_and_draw(now);
+  poll_oled(ms);
+  report_statistics(now);
 }

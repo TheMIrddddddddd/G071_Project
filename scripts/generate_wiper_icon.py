@@ -8,7 +8,7 @@ import hashlib
 from PIL import Image, ImageSequence
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"scripts/assets/wiper_wide_sweep_128x64.gif"
-OUTPUT=ROOT/"App/app_wiper_icon_data.inc"
+OUTPUT=ROOT/"App/ui/components/icons/app_wiper_icon_data.inc"
 
 
 def load_frames():

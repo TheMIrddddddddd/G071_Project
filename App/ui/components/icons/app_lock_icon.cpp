@@ -30,9 +30,9 @@ int16_t projected_x(int16_t x,int16_t scale)
   return static_cast<int16_t>(9+rounded);
 }
 }
-void app_lock_icon_draw(u8g2_t *u,uint8_t x,uint8_t y,uint64_t elapsed_us)
+int16_t app_lock_icon_sample(uint64_t elapsed_us) { return shackle_scale(elapsed_us); }
+void app_lock_icon_draw_state(u8g2_t *u,uint8_t x,uint8_t y,int16_t scale)
 {
-  const int16_t scale=shackle_scale(elapsed_us);
   for(unsigned i=1;i<sizeof(shackle)/sizeof(shackle[0]);i++) {
     const Point a=shackle[i-1],b=shackle[i];
     u8g2_DrawLine(u,static_cast<u8g2_uint_t>(x+projected_x(a.x,scale)),
@@ -43,3 +43,5 @@ void app_lock_icon_draw(u8g2_t *u,uint8_t x,uint8_t y,uint64_t elapsed_us)
   u8g2_DrawRFrame(u,x+7U,y+6U,11U,9U,2U);
   u8g2_DrawVLine(u,x+12U,y+10U,2U);
 }
+void app_lock_icon_draw(u8g2_t *u,uint8_t x,uint8_t y,uint64_t elapsed_us)
+{ app_lock_icon_draw_state(u,x,y,app_lock_icon_sample(elapsed_us)); }

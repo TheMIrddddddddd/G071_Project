@@ -6,17 +6,17 @@ Debug/Optimized 当前选择 `APP_DISPLAY_MODE=LAYOUT`：上方 16 行（0..15�
 
 灯光轮廓根据用户提供的实物开关图片重绘：侧向灯体、左侧灯座、关闭斜杠、开启内部弧线及外侧四条光芒。参考 `01_灯光开关_OLED128x64.gif` 的 2760 ms 周期：关闭 480 ms、打开过渡 600 ms、开启 640 ms、关闭过渡 600 ms、关闭 440 ms。当前是自动模拟，不控制实际照明灯，也未接入 RK 状态报文。
 
-锁图标参考 `锁梁左右180旋转_瘦高版_OLED128x64.gif`：锁体和锁孔固定，锁梁绕左腿由闭合位置转开到左侧，再转回闭合。`App/app_lock_icon.cpp` 用整数缓动改变锁梁横向投影，无浮点三角函数、无动态分配。1960 ms 周期包含闭合 240 ms、转开 440 ms、打开 520 ms、转回 440 ms、闭合 320 ms，与灯光周期独立；当前六个图标均为模拟状态，未接入 RK。
+锁图标参考 `锁梁左右180旋转_瘦高版_OLED128x64.gif`：锁体和锁孔固定，锁梁绕左腿由闭合位置转开到左侧，再转回闭合。`App/ui/components/icons/app_lock_icon.cpp` 用整数缓动改变锁梁横向投影，无浮点三角函数、无动态分配。1960 ms 周期包含闭合 240 ms、转开 440 ms、打开 520 ms、转回 440 ms、闭合 320 ms，与灯光周期独立；当前六个图标均为模拟状态，未接入 RK。
 
-快速模式使用小图标的单像素 OFF 斜线和实心 ON 闪电，2520 ms 循环包含斜线收回、轮廓逐渐填充、点亮停留、逆向熄灭及斜线恢复。`scripts/generate_fast_icon.py` 从随工程保存的用户参考 GIF 生成 20 个去重的 20×16 位图与 39 段时间表，小图使用 1 像素禁止线。`App/app_fast_icon.cpp` 从 Flash 直接播放，不在 MCU 解码 GIF，不增加静态 RAM 或动态分配。可用 `python scripts/generate_fast_icon.py --check` 核对生成数据。
+快速模式使用小图标的单像素 OFF 斜线和实心 ON 闪电，2520 ms 循环包含斜线收回、轮廓逐渐填充、点亮停留、逆向熄灭及斜线恢复。`scripts/generate_fast_icon.py` 从随工程保存的用户参考 GIF 生成 20 个去重的 20×16 位图与 39 段时间表，小图使用 1 像素禁止线。`App/ui/components/icons/app_fast_icon.cpp` 从 Flash 直接播放，不在 MCU 解码 GIF，不增加静态 RAM 或动态分配。可用 `python scripts/generate_fast_icon.py --check` 核对生成数据。
 
-雨刮器以用户确认的大范围 GIF 为标准，原点在下方中央；保留关闭静止 800 ms、开启连续四轮往复（每轮 1200 ms）、关闭停靠 800 ms 的 6400 ms 周期。参考原件保存在 `scripts/assets/wiper_wide_sweep_128x64.gif`。`scripts/generate_wiper_icon.py` 使用固定裁剪及 20×12 光栅居中放入 20×16 格，适当增加垂直像素以区分下边框和雨刮臂，所有帧使用同一映射。生成 16 个去重位图及时间表；`App/app_wiper_icon.cpp` 仅依据经过时间选帧，不解码 GIF、不分配动态内存。
+雨刮器以用户确认的大范围 GIF 为标准，原点在下方中央；保留关闭静止 800 ms、开启连续四轮往复（每轮 1200 ms）、关闭停靠 800 ms 的 6400 ms 周期。参考原件保存在 `scripts/assets/wiper_wide_sweep_128x64.gif`。`scripts/generate_wiper_icon.py` 使用固定裁剪及 20×12 光栅居中放入 20×16 格，适当增加垂直像素以区分下边框和雨刮臂，所有帧使用同一映射。生成 16 个去重位图及时间表；`App/ui/components/icons/app_wiper_icon.cpp` 仅依据经过时间选帧，不解码 GIF、不分配动态内存。
 
-手形 ↔ 方向盘以确认后的清晰四角星预览为基础，手指朝上，指尖为直接收口的圆头，方向盘右上角为 7×7 等长四尖星。原始 GIF 保存在 `scripts/assets/hand_wheel_clear_star.gif`；`scripts/generate_hand_wheel_icon.py` 检查每个放大像素块为纯黑或纯白，修正手指顶部轮廓并按原缓动和 Bayer 阈值同步修正双向过渡，再打包为 14 个 20×16 XBM 位图和 80 项帧序列，共 752 B 常量。周期 3200 ms，每步 40 ms，包含两个方向的过渡和停留；`App/app_hand_wheel_icon.cpp` 按 64 位经过时间直接选帧，不解码 GIF、不动态分配、不增加静态 RAM。生成数据携带原 GIF 的 SHA256 和指尖修正说明。
+手形 ↔ 方向盘以确认后的清晰四角星预览为基础，手指朝上，指尖为直接收口的圆头，方向盘右上角为 7×7 等长四尖星。原始 GIF 保存在 `scripts/assets/hand_wheel_clear_star.gif`；`scripts/generate_hand_wheel_icon.py` 检查每个放大像素块为纯黑或纯白，修正手指顶部轮廓并按原缓动和 Bayer 阈值同步修正双向过渡，再打包为 14 个 20×16 XBM 位图和 80 项帧序列，共 752 B 常量。周期 3200 ms，每步 40 ms，包含两个方向的过渡和停留；`App/ui/components/icons/app_hand_wheel_icon.cpp` 按 64 位经过时间直接选帧，不解码 GIF、不动态分配、不增加静态 RAM。生成数据携带原 GIF 的 SHA256 和指尖修正说明。
 
-电池沿用确认的 20×16 GIF，外框和右侧电极保持固定，充电用实心闪电表示，非充电依次演示 1、2、3、4 格电量，状态间保留原过渡。完整周期 6640 ms，当前是自动演示，未读取充电引脚或 RK 电量报文。原件保存在 `scripts/assets/battery_charge_levels_20x16.gif`，`scripts/generate_battery_icon.py` 原样打包为 31 个去重位图、32 段时间表；`App/app_battery_icon.cpp` 从 Flash 按 64 位经过时间选帧，不解码 GIF、不新增静态 RAM 或动态分配。
+电池沿用确认的 20×16 GIF，外框和右侧电极保持固定，充电用实心闪电表示，非充电依次演示 1、2、3、4 格电量，状态间保留原过渡。完整周期 6640 ms，当前是自动演示，未读取充电引脚或 RK 电量报文。原件保存在 `scripts/assets/battery_charge_levels_20x16.gif`，`scripts/generate_battery_icon.py` 原样打包为 31 个去重位图、32 段时间表；`App/ui/components/icons/app_battery_icon.cpp` 从 Flash 按 64 位经过时间选帧，不解码 GIF、不新增静态 RAM 或动态分配。
 
-`App/app_light_icon.cpp` 只接收经过时间并绘制；两个 20×16 位图以常量行掩码保存，使用整数缓动及固定空间阈值作单色渐变，不在 MCU 上解码 GIF，不分配堆内存。`app_ui` 使用 TIM2 的 64 位时间推进模型；LAYOUT 最多每 40 ms 绘图一次，静止阶段像素不变时没有 OLED 数据传输。动画修改只在前台进行。
+`App/ui/components/icons/app_light_icon.cpp` 只接收经过时间并绘制；两个 20×16 位图以常量行掩码保存，使用整数缓动及固定空间阈值作单色渐变，不在 MCU 上解码 GIF，不分配堆内存。`app_ui` 使用 TIM2 的 64 位时间推进模型；LAYOUT 最多每 40 ms 绘图一次，静止阶段像素不变时没有 OLED 数据传输。动画修改只在前台进行。
 
 验证：`python tests/run_layout_tests.py` 检查图标范围、上下分区、停留阶段、双向过渡、五个独立循环、锁梁侧视状态、固定锁体、雨刮关闭停靠与连续刮动、四角星轮廓、64 位时刻及差分区域。可加输出路径导出每 40 ms 一帧的原始 1024 字节画面，例如 `python tests/run_layout_tests.py build/five-icons-preview/frames.bin`（先创建输出目录）。`python scripts/generate_hand_wheel_icon.py --check --verify-ui build/five-icons-preview/frames.bin` 已核对 320 帧第五格像素与指尖修正后的动画完全相同，包含循环回绕。修正范围仅在手形顶部，方向盘和四角星像素保持原样；手势源位图哈希与本次修改前一致，第四格雨刮放大预览为 `build/five-icons-preview/wiper-detail.gif`。
 

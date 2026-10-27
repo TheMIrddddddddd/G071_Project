@@ -10,7 +10,7 @@ from PIL import Image, ImageSequence
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "scripts/assets/battery_charge_levels_20x16.gif"
-OUTPUT = ROOT / "App/app_battery_icon_data.inc"
+OUTPUT = ROOT / "App/ui/components/icons/app_battery_icon_data.inc"
 
 
 def load_frames():

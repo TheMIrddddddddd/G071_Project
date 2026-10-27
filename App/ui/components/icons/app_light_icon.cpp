@@ -60,11 +60,14 @@ uint8_t on_level(uint64_t elapsed_us)
   return 0;
 }
 }
-void app_light_icon_draw(u8g2_t *u,uint8_t x,uint8_t y,uint64_t elapsed_us)
+int16_t app_light_icon_sample(uint64_t elapsed_us) { return on_level(elapsed_us); }
+void app_light_icon_draw_state(u8g2_t *u,uint8_t x,uint8_t y,int16_t state)
 {
-  const uint8_t level=on_level(elapsed_us);
+  const uint8_t level=static_cast<uint8_t>(state);
   for(uint8_t row=0;row<16U;row++)for(uint8_t col=0;col<20U;col++) {
     const uint32_t bits=(level>threshold[row&3U][col&3U])?on_rows[row]:off_rows[row];
     if(bits&(1UL<<col))u8g2_DrawPixel(u,x+col,y+row);
   }
 }
+void app_light_icon_draw(u8g2_t *u,uint8_t x,uint8_t y,uint64_t elapsed_us)
+{ app_light_icon_draw_state(u,x,y,app_light_icon_sample(elapsed_us)); }

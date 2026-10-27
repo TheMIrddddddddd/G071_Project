@@ -1,6 +1,9 @@
 #include "app_ui.h"
 #include "app_joystick.h"
 #include "oled_refresh.h"
+#include "ui/status_bar/status_bar.h"
+#include "ui/components/icons/app_light_icon.h"
+#include "u8g2_port.h"
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -194,5 +197,20 @@ int main(int argc,char **argv) {
  assert(std::memcmp(previous,frame,256)!=0);
  assert(std::memcmp(previous+256,frame+256,768)==0);
  assert(!app_ui_failed()&&app_ui_heap_peak()==0);
+  // Configure the actual page component, then verify it renders at the new
+  // position and speed through the normal app_ui update/draw path.
+  assert(app_ui_init(epoch,frame));
+  for(unsigned k=0;k<UI_ICON_TYPE_COUNT;k++)
+    assert(ui_icon_set_visible(status_bar_get(static_cast<ui_icon_type_t>(k)),false));
+  ui_icon_t *light=status_bar_get(UI_ICON_LIGHT);
+  assert(light&&ui_icon_set_position(light,60,0));
+  assert(ui_icon_set_period(light,5520,epoch));
+  assert(ui_icon_set_visible(light,true));
+  assert(app_ui_update(epoch+1200000));
+  const app_ui_status_t status={};
+  assert(app_ui_draw(frame,&status));
+  U8G2_PortBind(on);u8g2_ClearBuffer(U8G2_PortContext());
+  app_light_icon_draw(U8G2_PortContext(),60,0,600000);
+  assert(region_equal(frame,on,60,20));
  std::printf("PASS: six status icons bounds/holds/independent cycles/lock/star/wiper/battery charging and four levels/64-bit time/diff; %u changed frames\n",changed);
 }

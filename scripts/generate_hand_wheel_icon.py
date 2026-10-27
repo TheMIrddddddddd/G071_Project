@@ -11,7 +11,7 @@ from PIL import Image, ImageSequence
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "scripts/assets/hand_wheel_clear_star.gif"
-OUTPUT = ROOT / "App/app_hand_wheel_icon_data.inc"
+OUTPUT = ROOT / "App/ui/components/icons/app_hand_wheel_icon_data.inc"
 WIDTH, HEIGHT, SCALE = 20, 16, 20
 FRAME_MS = 40
 

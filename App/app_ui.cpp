@@ -2,27 +2,18 @@
 #include "u8g2_port.h"
 #include <cstdio>
 #if APP_LAYOUT
-#include "app_light_icon.h"
-#include "app_lock_icon.h"
-#include "app_fast_icon.h"
-#include "app_hand_wheel_icon.h"
-#include "app_wiper_icon.h"
-#include "app_battery_icon.h"
-#include "app_joystick.h"
+#include "remote_page.h"
 #endif
 #if APP_SHOWCASE
 #include "showcase_model.h"
 #include "smooth_memory.h"
 #endif
 namespace { bool failed; }
-#if APP_LAYOUT
-namespace { uint64_t layout_epoch, layout_now; }
-#endif
 bool app_ui_init(uint64_t now, uint8_t *bootstrap)
 {
   U8G2_PortInit(bootstrap);
 #if APP_LAYOUT
-  layout_epoch=layout_now=now;failed=!app_joystick_init(now);return !failed;
+  failed=!remote_page_init(now);return !failed;
 #elif APP_SHOWCASE
   try {
     if(!Showcase_InitWithBuffer(now,bootstrap)) {failed=true;return false;}
@@ -44,8 +35,7 @@ uint32_t app_ui_heap_peak(void)
 bool app_ui_update(uint64_t now)
 {
 #if APP_LAYOUT
-  if(!app_joystick_update(now))return false;
-  layout_now=now;return true;
+  return remote_page_update(now);
 #elif APP_SHOWCASE
   if(failed)return false;
   try { return Showcase_Update(now); } catch(...) {failed=true;return false;}
@@ -58,15 +48,7 @@ bool app_ui_draw(uint8_t *frame,const app_ui_status_t *status)
 #if APP_LAYOUT
   (void)status;
   auto *u=U8G2_PortContext();U8G2_PortBind(frame);u8g2_ClearBuffer(u);
-  /* Rows 0..15: switch status bar. Row 16: divider. Rows 17..63: joysticks. */
-  u8g2_DrawHLine(u,0,16,128);
-  app_light_icon_draw(u,0,0,layout_now-layout_epoch);
-  app_lock_icon_draw(u,21,0,layout_now-layout_epoch);
-  app_fast_icon_draw(u,42,0,layout_now-layout_epoch);
-  app_wiper_icon_draw(u,63,0,layout_now-layout_epoch);
-  app_hand_wheel_icon_draw(u,84,0,layout_now-layout_epoch);
-  app_battery_icon_draw(u,105,0,layout_now-layout_epoch);
-  return app_joystick_draw(u);
+  return remote_page_draw(u);
 #else
 #if APP_SHOWCASE
   if(!failed) {

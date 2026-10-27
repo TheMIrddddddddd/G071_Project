@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageSequence
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "scripts/assets/lightning_normal_to_fast.gif"
-OUTPUT = ROOT / "App/app_fast_icon_data.inc"
+OUTPUT = ROOT / "App/ui/components/icons/app_fast_icon_data.inc"
 
 
 def compact_frames():

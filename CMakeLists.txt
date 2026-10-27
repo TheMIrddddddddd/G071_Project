@@ -59,7 +59,14 @@ elseif(APP_DISPLAY_MODE STREQUAL "LAYOUT")
     target_compile_options(oled_smooth_upstream PRIVATE -fexceptions)
     target_link_libraries(${CMAKE_PROJECT_NAME} oled_joystick)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE APP_SHOWCASE=0 APP_LAYOUT=1)
-    target_sources(${CMAKE_PROJECT_NAME} PRIVATE App/app_light_icon.cpp App/app_lock_icon.cpp App/app_fast_icon.cpp App/app_hand_wheel_icon.cpp App/app_wiper_icon.cpp App/app_battery_icon.cpp App/app_joystick.cpp)
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        App/ui/components/icons/app_light_icon.cpp App/ui/components/icons/app_lock_icon.cpp App/ui/components/icons/app_fast_icon.cpp
+        App/ui/components/icons/app_hand_wheel_icon.cpp App/ui/components/icons/app_wiper_icon.cpp App/ui/components/icons/app_battery_icon.cpp
+        App/app_joystick.cpp App/app_joystick_demo.cpp App/app_joystick_view.cpp
+        App/ui/pages/remote_page.cpp App/ui/status_bar/status_bar.cpp
+        App/ui/components/animated_icon.cpp)
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        App/ui/pages App/ui/status_bar App/ui/components App/ui/components/icons)
 else()
     message(FATAL_ERROR "APP_DISPLAY_MODE must be LAYOUT, SHOWCASE or STATUS")
 endif()
